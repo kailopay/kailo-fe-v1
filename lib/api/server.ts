@@ -16,7 +16,7 @@ export async function serverApiRequest(
   const headers = buildHeaders(options);
   if (session !== undefined) headers.cookie = `${SESSION_COOKIE_NAME}=${session.value}`;
 
-  const origin = process.env.API_ORIGIN ?? "http://localhost:8080";
+  const origin = process.env.API_ORIGIN ?? "http://localhost:8081";
   const response = await fetch(`${origin}${path}`, {
     method: options.method ?? (options.body !== undefined ? "POST" : "GET"),
     headers,
