@@ -14,13 +14,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ```
 app/                  # Routing ONLY — layouts, pages, route handlers; pages stay thin
-  (auth)/             # Route group: /login, /register — bare centered layout
-  (dashboard)/        # Route group: app-shell layout (nav + content)
-    settings/_components/  # Private folder: colocated components, never routable
+  (session)/          # Route group: session app shell (nav + sandbox badges)
+    profile/          # /profile: display name, Developer Mode, avatar
+    developer/        # /developer: API keys; playground/ + orders/[id]/; _components/ colocated
+  session-expired/    # Public 401 explainer (NOT under /auth: backend owns that path)
 components/           # Shared UI across routes/features (ui/ = primitives)
-features/             # Feature modules (auth, payment, transactions): components + hooks + utils + types colocated
+features/             # Feature modules (auth, developer, orders): components + hooks + utils + types colocated
 hooks/                # React hooks shared across features
-lib/                  # Non-UI shared logic (API client, formatters, constants, session)
+lib/                  # Non-UI shared logic; api/ = typed client, dual error envelopes, wire types
 public/               # Static assets
 ```
 
@@ -29,11 +30,24 @@ public/               # Static assets
 - `app/` is for routing only. Pages compose components and fetch data; implementation lives in `features/` (domain-specific) or `components/` + `lib/` (shared).
 - Organize by feature, not by file type: a component used by one feature lives in `features/<domain>/`, not in a global type-folder.
 - Route-specific components colocate under the route in a private `_components/` folder (underscore = opted out of routing).
-- Route groups `(name)` never appear in the URL — use them to give sections different layouts (e.g. `(auth)` vs `(dashboard)`).
+- Route groups `(name)` never appear in the URL — use them to give sections different layouts (e.g. `(session)` app shell vs bare public pages).
 - New sections follow the same pattern: add a route group with its own `layout.tsx`.
-- Import with the `@/` alias (e.g. `@/components/ui/button`, `@/lib/api`), never long relative paths.
+- Import with the `@/` alias (e.g. `@/components/ui/button`, `@/lib/api/client`), never long relative paths.
 - Prefer Server Components by default; add `"use client"` only where interactivity requires it.
 - Next.js 16 (installed here): `params`/`searchParams` are Promises — await them. Type layouts/pages with the globally available `LayoutProps<'/route'>` / `PageProps<'/route'>` helpers.
+
+## Backend integration
+
+Contract authority: `kailopay-be/openapi/openapi.yaml` (sibling repo). Frontend guide: `documentations/FRONTEND-GUIDE.md`. Wire types live in `lib/api/types.ts`.
+
+- `/auth`, `/v1`, `/livez`, `/readyz`, `/startupz` are proxied to the backend via `rewrites` in `next.config.ts` (origin: `API_ORIGIN`, default `http://localhost:8080`). The backend sends no CORS headers by design. Never create frontend routes under those paths.
+- Login is full-window navigation to `/auth/login` (plain `<a>`, never `next/link`). There is no `/register` route: Auth0 owns account creation. Treat 401 as "redirect to sign-in".
+- Money and XLM amounts are decimal strings end to end. Never convert to JS numbers for arithmetic.
+- JSON bodies must contain only documented fields: the backend rejects unknown keys with 400.
+- The backend has two error envelope styles; `ApiError` (lib/api) normalizes both. Surface `code`, keep `request_id` for support copy.
+- `pk_test_` API keys live in memory only (never bundled, stored, or logged) and are wiped on logout.
+- `POST /v1/onramps` requires an `Idempotency-Key` per user intent; reuse the same key on retry of that intent.
+- Every value-movement screen shows the Sandbox + Stellar Testnet badges (`components/sandbox-badges.tsx`, product rule FR-053).
 
 ## UI style preferences
 

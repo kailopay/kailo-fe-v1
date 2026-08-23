@@ -1,26 +1,153 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #fdfcfa;
+  --paper-recess: #f2f4f8;
+  --cloud: #f3f7ff;
+  --ink: #0f1e38;
+  --ink-deep: #1a2c52;
+  --ink-2: #47536d;
+  --ink-3: #66718b;
+  --line: #e4e8ef;
+  --line-strong: #bac3d3;
+  --sky: #6bb1ff;
+  --sky-deep: #2b6cb8;
+  --sky-tint: #e8f2ff;
+  --sea: #5ddfd7;
+  --sea-deep: #177068;
+  --sea-tint: #e0f6f2;
+  --orchid: #b89ffa;
+  --orchid-deep: #6d55c2;
+  --orchid-tint: #efebff;
+  --sun: #f8961f;
+  --sun-deep: #9a5c10;
+  --sun-tint: #fdf0dd;
+  --brass: #a3770e;
+  --brass-text: #7d5c05;
+  --brass-deep: #654c04;
+  --gold: #d9a441;
+  --ink-plate: #101f3a;
+  --plate-line: #2c3c5c;
+  --paper-on-plate: #f0f4fb;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-recess: var(--paper-recess);
+  --color-cloud: var(--cloud);
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-sky: var(--sky);
+  --color-sky-deep: var(--sky-deep);
+  --color-sky-tint: var(--sky-tint);
+  --color-sea: var(--sea);
+  --color-sea-deep: var(--sea-deep);
+  --color-sea-tint: var(--sea-tint);
+  --color-orchid: var(--orchid);
+  --color-orchid-deep: var(--orchid-deep);
+  --color-orchid-tint: var(--orchid-tint);
+  --color-sun: var(--sun);
+  --color-sun-deep: var(--sun-deep);
+  --color-sun-tint: var(--sun-tint);
+  --color-brass: var(--brass);
+  --color-brass-text: var(--brass-text);
+  --color-brass-deep: var(--brass-deep);
+  --color-gold: var(--gold);
+  --color-ink-plate: var(--ink-plate);
+  --color-plate-line: var(--plate-line);
+  --color-paper-on-plate: var(--paper-on-plate);
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* One light world: near-white ground, navy ink, pastel state colors. */
+html {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #dbe9ff;
+  color: var(--ink);
+}
+
+* {
+  caret-color: var(--sky-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--sky-deep);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 5px;
+  border: 3px solid var(--paper);
+}
+
+.tnum {
+  font-feature-settings: "tnum" 1;
+}
+
+/* Signature moment: the bearing draws itself, the stars ignite in sequence. */
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: var(--len, 620);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes star-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.compass-draw {
+  stroke-dasharray: var(--len, 620);
+  animation: draw-line 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.compass-star {
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: star-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass-draw,
+  .compass-star {
+    animation: none;
+    opacity: 1;
+  }
 }

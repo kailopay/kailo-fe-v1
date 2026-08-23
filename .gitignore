@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design-process and test artifacts (screenshots, decision payloads, review captures)
+/.impeccable/
+/gui-test-screenshots/
