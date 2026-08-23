@@ -1,21 +1,44 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { ApiError } from "@/lib/api/client";
-import { createOrder, type CreateOrderInput } from "@/lib/api/orders";
+import { createOrder, getOrder, type CreateOrderInput } from "@/lib/api/orders";
 import type { Order } from "@/lib/api/types";
 import { OrderCreateForm, type CreateOrderFormValue } from "./order-create-form";
 import { OrderDetail } from "./order-detail";
+import { OrderHistory } from "./order-history";
 
 const KEY_PATTERN = /^pk_test_/;
 
-export function PlaygroundFlow() {
+export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) {
   const [apiKey, setApiKey] = useState("");
   const [keyAccepted, setKeyAccepted] = useState(false);
   const [creating, setCreating] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [retry, setRetry] = useState<{ input: CreateOrderInput } | null>(null);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+
+  // Deep link (?order=<id>): fetch that order once the key is accepted.
+  useEffect(() => {
+    if (!keyAccepted || initialOrderId === undefined) return;
+    let cancelled = false;
+    getOrder(initialOrderId, apiKey)
+      .then((found) => {
+        if (!cancelled) setOrder(found);
+      })
+      .catch((caught) => {
+        if (cancelled) return;
+        setError(
+          caught instanceof ApiError && caught.code === "ORDER_NOT_FOUND"
+            ? "That order was not found for this key. It may belong to another key."
+            : "Could not load the linked order.",
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [keyAccepted, initialOrderId, apiKey]);
 
   function acceptKey(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -36,6 +59,7 @@ export function PlaygroundFlow() {
       const created = await createOrder(input);
       setOrder(created);
       setRetry(null);
+      handleCreated();
     } catch (caught) {
       if (caught instanceof ApiError) {
         setError(
@@ -63,6 +87,10 @@ export function PlaygroundFlow() {
       idempotencyKey: crypto.randomUUID(),
     };
     void submitOrder(input);
+  }
+
+  function handleCreated(): void {
+    setHistoryRefreshKey((current) => current + 1);
   }
 
   function handleRetry(): void {
@@ -153,6 +181,14 @@ export function PlaygroundFlow() {
           )}
         </div>
       </section>
+
+      <div className="mt-12 border-t border-line pt-8 lg:col-span-2">
+        <OrderHistory
+          apiKey={apiKey}
+          onOpenOrder={setOrder}
+          refreshKey={historyRefreshKey}
+        />
+      </div>
     </div>
   );
 }

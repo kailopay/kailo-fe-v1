@@ -44,10 +44,7 @@ function parseCheckout(value: unknown): Checkout | null {
   };
 }
 
-function parseOrderEnvelope(payload: unknown): Order {
-  if (!isRecord(payload) || !isRecord(payload.order)) throw malformed("order");
-  const order = payload.order;
-
+function parseOrderBody(order: Record<string, unknown>): Order {
   const status = stringField(order, "status");
   if (!isOrderStatus(status)) throw malformed(`order status "${status}"`);
 
@@ -98,6 +95,11 @@ function parseOrderEnvelope(payload: unknown): Order {
   return parsed;
 }
 
+function parseOrderEnvelope(payload: unknown): Order {
+  if (!isRecord(payload) || !isRecord(payload.order)) throw malformed("order");
+  return parseOrderBody(payload.order);
+}
+
 function malformed(what: string): ApiError {
   return new ApiError(`Malformed payload: ${what}`, 0, "MALFORMED_RESPONSE", null);
 }
@@ -132,4 +134,33 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
 export async function getOrder(id: string, apiKey: string): Promise<Order> {
   const payload: unknown = await apiRequest(`/v1/orders/${id}`, { apiKey });
   return parseOrderEnvelope(payload);
+}
+
+export type OrdersPage = {
+  orders: Order[];
+  /** Empty string means there are no more pages. Opaque; never parse it. */
+  nextCursor: string;
+};
+
+/** GET /v1/orders with cursor pagination. */
+export async function listOrders(
+  apiKey: string,
+  options: { cursor?: string; limit?: number } = {},
+): Promise<OrdersPage> {
+  const limit = Math.min(Math.max(options.limit ?? 20, 1), 100);
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (options.cursor !== undefined && options.cursor !== "") {
+    params.set("cursor", options.cursor);
+  }
+  const payload: unknown = await apiRequest(`/v1/orders?${params.toString()}`, { apiKey });
+  if (!isRecord(payload) || !Array.isArray(payload.orders)) throw malformed("orders page");
+  const nextCursor: unknown = payload.next_cursor;
+  if (typeof nextCursor !== "string") throw malformed("next_cursor");
+  return {
+    orders: payload.orders.map((entry) => {
+      if (!isRecord(entry)) throw malformed("orders page entry");
+      return parseOrderBody(entry);
+    }),
+    nextCursor,
+  };
 }

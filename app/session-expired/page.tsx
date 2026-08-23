@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SandboxBadges } from "@/components/sandbox-badges";
+import { ForgotPassword } from "@/features/auth/forgot-password";
 
 export const metadata: Metadata = {
   title: "Session expired",
@@ -21,6 +22,7 @@ export default function SessionExpiredPage() {
       >
         Sign in
       </a>
+      <ForgotPassword />
     </div>
   );
 }
