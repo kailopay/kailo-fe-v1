@@ -1,4 +1,4 @@
-import type { User } from "./types";
+import type { ApiKeyCreated, ApiKeyMeta, User } from "./types";
 
 /** Configurable on the backend; this is the default. */
 export const SESSION_COOKIE_NAME = "kailopay_session";
@@ -124,6 +124,51 @@ export function parseUser(payload: unknown): User {
 
 export async function getSession(): Promise<User> {
   return parseUser(await apiRequest("/auth/me"));
+}
+
+function malformed(what: string): ApiError {
+  return new ApiError(`Malformed payload: ${what}`, 0, "MALFORMED_RESPONSE", null);
+}
+
+function optionalStringOrUndefined(record: Record<string, unknown>, key: string): string | undefined {
+  const value: unknown = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== "string") throw malformed(`field "${key}"`);
+  return value;
+}
+
+function parseApiKeyMeta(value: unknown): ApiKeyMeta {
+  if (!isRecord(value)) throw malformed("api key entry");
+  const revoked: unknown = value.revoked_at;
+  if (revoked !== null && typeof revoked !== "string") throw malformed('field "revoked_at"');
+  return {
+    id: stringField(value, "id"),
+    client_id: stringField(value, "client_id"),
+    name: stringField(value, "name"),
+    prefix: stringField(value, "prefix"),
+    created_at: stringField(value, "created_at"),
+    last_used_at: optionalStringOrUndefined(value, "last_used_at"),
+    revoked_at: revoked,
+  };
+}
+
+/** Boundary parse of the GET /v1/api-keys envelope. */
+export function parseApiKeys(payload: unknown): ApiKeyMeta[] {
+  if (!isRecord(payload) || !Array.isArray(payload.api_keys)) throw malformed("api keys list");
+  return payload.api_keys.map(parseApiKeyMeta);
+}
+
+/** Boundary parse of the POST /v1/api-keys envelope (contains the one-time key). */
+export function parseApiKeyCreated(payload: unknown): ApiKeyCreated {
+  if (!isRecord(payload) || !isRecord(payload.api_key)) throw malformed("api key");
+  const key = payload.api_key;
+  return {
+    id: stringField(key, "id"),
+    client_id: stringField(key, "client_id"),
+    prefix: stringField(key, "prefix"),
+    key: stringField(key, "key"),
+    created_at: stringField(key, "created_at"),
+  };
 }
 
 /**
