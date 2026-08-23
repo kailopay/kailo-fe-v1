@@ -32,7 +32,7 @@ export type RequestOptions = {
   signal?: AbortSignal;
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
@@ -89,9 +89,17 @@ export async function apiRequest(
   return await response.json();
 }
 
-function stringField(record: Record<string, unknown>, key: string): string {
+export function stringField(record: Record<string, unknown>, key: string): string {
   const value: unknown = record[key];
   if (typeof value !== "string") {
+    throw new ApiError(`Malformed session payload: field "${key}"`, 0, "MALFORMED_RESPONSE", null);
+  }
+  return value;
+}
+
+export function numberField(record: Record<string, unknown>, key: string): number {
+  const value: unknown = record[key];
+  if (typeof value !== "number") {
     throw new ApiError(`Malformed session payload: field "${key}"`, 0, "MALFORMED_RESPONSE", null);
   }
   return value;
