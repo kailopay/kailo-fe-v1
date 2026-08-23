@@ -1,11 +1,11 @@
 "use client";
 
-import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { formatIdr } from "@/lib/format-money";
 import type { Order } from "@/lib/api/types";
 import { getOrder } from "@/lib/api/orders";
 import { isActiveStatus, statusStyle } from "./status";
+import { PaymentPanel } from "./payment-panel";
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -21,10 +21,12 @@ type OrderDetailProps = {
   onPollError: (message: string) => void;
 };
 
+/**
+ * The order page as a three-step checkout story, in the Xendit payment-page
+ * spirit: what you buy (1), pay (2), and what happens after (3).
+ */
 export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderDetailProps) {
   const [order, setOrder] = useState(initialOrder);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [remaining, setRemaining] = useState(() => secondsRemaining(initialOrder.quote.expires_at));
 
   // Poll while the order is in an active state; stop on anything terminal.
@@ -44,126 +46,119 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
     return () => clearInterval(timer);
   }, [initialOrder.id, initialOrder.status, apiKey, onPollError]);
 
-  // Render the QRIS string as a QR code. A given order's presentation never
-  // changes type, and the parent remounts this component per order id.
-  useEffect(() => {
-    if (initialOrder.checkout?.presentation_type !== "QR_STRING") return;
-    let cancelled = false;
-    QRCode.toDataURL(initialOrder.checkout.presentation_value, { width: 240, margin: 1 })
-      .then((url) => {
-        if (!cancelled) setQrDataUrl(url);
-      })
-      .catch(() => {
-        // Leave the placeholder copy; the raw string still exists below.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [initialOrder.checkout?.presentation_type, initialOrder.checkout?.presentation_value]);
-
-  // Quote-window countdown, one tick per second.
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemaining(secondsRemaining(order.quote.expires_at));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [order.quote.expires_at]);
-
   const style = statusStyle(order.status);
-  const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const seconds = String(remaining % 60).padStart(2, "0");
-
-  async function copyVa(): Promise<void> {
-    if (order.checkout === null) return;
-    try {
-      await navigator.clipboard.writeText(order.checkout.presentation_value);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  }
+  const settled =
+    order.status === "completed" ||
+    order.status === "expired" ||
+    order.status === "payment_failed" ||
+    order.status === "stellar_failed";
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className={`rounded-full px-3 py-1 font-mono text-xs ${style.pill}`}>
-          {order.status}
-        </span>
-        <p className="font-mono text-xs text-ink-3">
-          {isActiveStatus(order.status) && order.status !== "stellar_processing"
-            ? `quote window ${minutes}:${seconds}`
-            : `updated ${order.updated_at}`}
-        </p>
-      </div>
-      <p className="text-sm leading-6 text-ink-2">{style.note}</p>
+      {/* Step 1 · what this order is */}
+      <section aria-label="Order summary" className="rounded-xl border border-line bg-surface p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="font-mono text-xs text-ink-3">step 1 of 3 · your order</p>
+            <p className="mt-1 text-lg font-semibold tracking-tight">
+              Buy {order.asset.amount} XLM for {formatIdr(order.fiat.amount_minor)} idr
+            </p>
+          </div>
+          <span className={`rounded-full px-3 py-1 font-mono text-xs ${style.pill}`}>
+            {order.status}
+          </span>
+        </div>
+        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 font-mono text-sm tnum sm:grid-cols-4">
+          <div>
+            <dt className="text-xs text-ink-3">you pay</dt>
+            <dd>{formatIdr(order.fiat.amount_minor)} idr</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-3">you receive</dt>
+            <dd>{order.asset.amount} xlm</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-3">rate</dt>
+            <dd>{order.quote.adjusted_rate}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-ink-3">spread</dt>
+            <dd>{order.quote.spread_bps} bps</dd>
+          </div>
+        </dl>
+        {settled && (
+          <p className="mt-4 border-t border-line pt-3 text-sm leading-6 text-ink-2">{style.note}</p>
+        )}
+      </section>
 
-      {order.checkout !== null && isActiveStatus(order.status) && (
-        <div className="rounded-[20px] border border-line bg-white p-6">
-          {order.checkout.presentation_type === "QR_STRING" ? (
-            qrDataUrl !== null ? (
-              <div className="flex flex-col items-center gap-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt="QRIS code" className="h-60 w-60" src={qrDataUrl} />
-                <p className="text-sm text-ink-3">
-                  Scan with any QRIS app. Sandbox: no real money moves.
-                </p>
-              </div>
-            ) : (
-              <p className="text-sm text-ink-3">Rendering the QR code…</p>
-            )
-          ) : (
-            <div className="flex flex-col items-center gap-3">
-              <p className="font-mono text-2xl tnum tracking-wide text-ink">
-                {order.checkout.presentation_value}
-              </p>
-              <button
-                className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
-                onClick={() => void copyVa()}
-                type="button"
-              >
-                {copied ? "Copied" : "Copy virtual account number"}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-[20px] border border-line bg-white px-5 py-4 font-mono text-sm tnum sm:grid-cols-4">
-        <div>
-          <dt className="text-xs text-ink-3">you pay</dt>
-          <dd>{formatIdr(order.fiat.amount_minor)} idr</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-ink-3">you receive</dt>
-          <dd>{order.asset.amount} xlm</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-ink-3">rate</dt>
-          <dd>{order.quote.adjusted_rate}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-ink-3">spread</dt>
-          <dd>{order.quote.spread_bps} bps</dd>
-        </div>
-      </dl>
-
-      {order.status === "completed" && order.stellar_transaction_hash !== undefined && (
-        <a
-          className="break-all rounded-[20px] border border-gold/40 bg-sun-tint px-5 py-4 text-sm font-medium text-sun-deep transition-colors hover:bg-sun-tint/70"
-          href={`https://stellar.expert/lumen/testnet/tx/${order.stellar_transaction_hash}`}
-          rel="noopener noreferrer"
-          target="_blank"
+      {/* Step 2 · pay (only while the checkout is alive) */}
+      {(order.status === "created" || order.status === "payment_pending") && (
+        <section
+          aria-label="Payment"
+          className="rounded-xl border border-line bg-paper-recess p-5"
         >
-          View the transfer on the testnet explorer
-        </a>
+          <p className="font-mono text-xs text-ink-3">step 2 of 3 · payment</p>
+          <div className="mt-4 rounded-lg bg-surface p-5 shadow-card">
+            <PaymentPanelHeaderNote status={order.status} />
+            <div className="mt-4">
+              <PaymentPanel order={order} remainingSeconds={remaining} />
+            </div>
+          </div>
+        </section>
       )}
 
-      {order.status === "stellar_failed" && (
-        <p className="rounded-[20px] border border-line bg-white px-5 py-4 text-sm leading-6 text-ink-2">
-          Keep the order id <span className="font-mono text-xs">{order.id}</span> for support.
-          Every response also carries a request id.
-        </p>
-      )}
+      {/* Step 3 · settlement */}
+      <section aria-label="Settlement" className="rounded-xl border border-line bg-surface p-5">
+        <p className="font-mono text-xs text-ink-3">step 3 of 3 · settlement on stellar testnet</p>
+
+        {order.status === "stellar_processing" && (
+          <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-ink-2" role="status">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orchid-deep opacity-50" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-orchid-deep" />
+            </span>
+            Sending your XLM. This is usually brief.
+          </p>
+        )}
+        {order.status !== "stellar_processing" && (
+          <p className="mt-3 text-sm leading-6 text-ink-2">{style.note}</p>
+        )}
+
+        {order.status === "completed" && order.stellar_transaction_hash !== undefined && (
+          <a
+            className="card-rise mt-4 inline-block break-all rounded-lg border border-gold/40 bg-sun-tint px-4 py-3 text-sm font-medium text-brass-text hover:border-gold"
+            href={`https://stellar.expert/lumen/testnet/tx/${order.stellar_transaction_hash}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            View the transfer on the testnet explorer
+          </a>
+        )}
+
+        {order.status === "stellar_failed" && (
+          <p className="mt-4 rounded-lg bg-sun-tint px-4 py-3 text-sm leading-6 text-sun-deep" role="alert">
+            Your payment arrived and will not be lost. Keep the order id{" "}
+            <span className="font-mono text-xs">{order.id}</span> for support; do not
+            pay again.
+          </p>
+        )}
+      </section>
+
+      <p className="font-mono text-xs leading-5 text-ink-3">
+        order {order.id} · sandbox environment · stellar testnet network · created{" "}
+        {order.created_at}
+      </p>
     </div>
   );
+}
+
+function PaymentPanelHeaderNote({ status }: { status: Order["status"] }): React.ReactElement {
+  if (status === "created") {
+    return (
+      <p className="text-sm leading-6 text-ink-2" role="status">
+        Preparing your checkout...
+      </p>
+    );
+  }
+  return <></>;
 }
