@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ApiKeysPanel } from "@/features/developer/api-keys-panel";
+import { EnableDeveloperMode } from "@/features/developer/enable-developer-mode";
 import { parseApiKeys } from "@/lib/api/client";
 import { serverApiRequest, getServerSession } from "@/lib/api/server";
 import type { ApiKeyMeta } from "@/lib/api/types";
@@ -21,14 +22,16 @@ export default async function DeveloperPage() {
         <div className="mt-6 rounded-[20px] border border-line bg-white p-6">
           <p className="text-sm leading-7 text-ink-2">
             Developer Mode is off. API key management needs it, and the
-            playground does too.
+            playground does too. Revoking keys does not disable it.
           </p>
-          <Link
-            className="mt-4 inline-flex h-11 items-center justify-center rounded-xl bg-ink px-6 text-sm font-medium text-paper transition-colors hover:bg-ink-deep"
-            href="/profile"
-          >
-            Enable Developer Mode on your profile
-          </Link>
+          <EnableDeveloperMode />
+          <p className="mt-4 text-xs text-ink-3">
+            You can also toggle it any time on your{" "}
+            <Link className="underline underline-offset-2" href="/profile">
+              profile
+            </Link>
+            .
+          </p>
         </div>
       </div>
     );

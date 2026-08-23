@@ -5,6 +5,7 @@ import { SignOutButton } from "@/features/auth/sign-out-button";
 import { getServerSession } from "@/lib/api/server";
 
 const navItems = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/profile", label: "Profile" },
   { href: "/developer", label: "Developer" },
   { href: "/developer/playground", label: "Playground" },

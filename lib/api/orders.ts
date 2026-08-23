@@ -128,7 +128,26 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
       },
     },
   });
+  // 202 is an ok-status response whose body is the error envelope: the
+  // checkout outcome is being reconciled. Surface it as a typed hold, not
+  // a malformed payload.
+  const holdCode = readOnrampErrorCode(payload);
+  if (holdCode !== null) {
+    throw new ApiError(
+      "The checkout outcome is being confirmed with the payment provider.",
+      202,
+      holdCode,
+      null,
+    );
+  }
   return parseOrderEnvelope(payload);
+}
+
+/** Error code when an ok-status payload is actually an OnrampError body. */
+function readOnrampErrorCode(payload: unknown): string | null {
+  if (!isRecord(payload) || !isRecord(payload.error)) return null;
+  const code: unknown = payload.error.code;
+  return typeof code === "string" ? code : null;
 }
 
 export async function getOrder(id: string, apiKey: string): Promise<Order> {

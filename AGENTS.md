@@ -17,10 +17,12 @@ app/                  # Routing ONLY — layouts, pages, route handlers; pages s
   (auth)/             # Route group: public auth screens (own bare layout)
     login/            # /login: email + password sign-in
     register/         # /register: create an account, then verify prompt
+    forgot-password/  # /forgot-password: request a reset link
     auth/
       verify-email/   # /auth/verify-email: consumes the console-link token
       reset-password/ # /auth/reset-password: consumes the reset-link token
   (session)/          # Route group: session app shell (nav + sandbox badges)
+    dashboard/        # /dashboard: post-login landing, user summary + links
     profile/          # /profile: display name, password, Developer Mode, avatar
     developer/        # /developer: API keys; playground/ + orders/[id]/; _components/ colocated
   session-expired/    # Public 401 explainer

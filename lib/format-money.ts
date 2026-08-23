@@ -19,3 +19,9 @@ export function parseIdrInput(input: string): string | null {
   if (digits.length === 0) return null;
   return digits.replace(/^0+(?=\d)/, "");
 }
+
+/** Typed input -> grouped display ("1250000" -> "1.250.000"), separators as you type. */
+export function formatIdrInput(input: string): string {
+  const minor = parseIdrInput(input);
+  return minor === null ? "" : groupFormatter.format(Number(minor));
+}

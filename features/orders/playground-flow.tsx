@@ -16,7 +16,9 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
   const [creating, setCreating] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requestId, setRequestId] = useState<string | null>(null);
   const [retry, setRetry] = useState<{ input: CreateOrderInput } | null>(null);
+  const [hold, setHold] = useState<{ input: CreateOrderInput } | null>(null);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // Deep link (?order=<id>): fetch that order once the key is accepted.
@@ -55,24 +57,31 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
   async function submitOrder(input: CreateOrderInput): Promise<void> {
     setCreating(true);
     setError(null);
+    setRequestId(null);
     try {
       const created = await createOrder(input);
       setOrder(created);
       setRetry(null);
-      handleCreated();
+      setHold(null);
+      setHistoryRefreshKey((current) => current + 1);
     } catch (caught) {
-      if (caught instanceof ApiError) {
-        setError(
-          caught.code !== null
-            ? `${caught.code}: ${caught.message}`
-            : caught.message,
-        );
+      if (caught instanceof ApiError && caught.status === 202) {
+        // CHECKOUT_PENDING_RECONCILIATION: the order exists and is held
+        // while the provider outcome settles. Never re-create it; the same
+        // key+body replay returns the order once reconciliation finishes.
+        setHold({ input });
+        setRetry(null);
+      } else if (caught instanceof ApiError) {
+        setError(explainCreateError(caught));
+        setRequestId(caught.requestId);
         // A rejected request is a finished intent; the next submit gets a new key.
         setRetry(null);
+        setHold(null);
       } else if (caught instanceof Error) {
         // The outcome is unknown (network). Reuse the SAME idempotency key
         // so a retry can only replay this intent, never double-create.
         setRetry({ input });
+        setHold(null);
         setError("The request may or may not have reached the server. Retry safely with the same idempotency key.");
       }
     } finally {
@@ -89,13 +98,14 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
     void submitOrder(input);
   }
 
-  function handleCreated(): void {
-    setHistoryRefreshKey((current) => current + 1);
-  }
-
   function handleRetry(): void {
     if (retry === null) return;
     void submitOrder(retry.input);
+  }
+
+  function handleHoldCheck(): void {
+    if (hold === null) return;
+    void submitOrder(hold.input);
   }
 
   const handlePollError = useCallback((message: string) => {
@@ -146,6 +156,25 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         <div className="mt-4">
           <OrderCreateForm busy={creating} onSubmit={handleCreate} />
         </div>
+        {hold !== null && (
+          <div className="mt-4 rounded-[20px] border border-line bg-sky-tint px-5 py-4" role="status">
+            <p className="text-sm font-medium text-sky-deep">
+              Processing the checkout with the payment provider.
+            </p>
+            <p className="mt-1 text-sm leading-6 text-sky-deep/80">
+              Your order exists and its outcome is being reconciled. Do not
+              create it again; check back with the same request.
+            </p>
+            <button
+              className="mt-3 h-11 rounded-xl border border-sky-deep/40 px-4 text-sm font-medium text-sky-deep transition-colors hover:border-sky-deep disabled:opacity-50"
+              disabled={creating}
+              onClick={handleHoldCheck}
+              type="button"
+            >
+              {creating ? "Checking" : "Check this order"}
+            </button>
+          </div>
+        )}
         {retry !== null && (
           <button
             className="mt-4 h-12 w-full rounded-xl bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-deep disabled:opacity-50"
@@ -159,6 +188,14 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         {error !== null && (
           <p className="mt-4 rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
             {error}
+            {requestId !== null && (
+              <>
+                {" "}
+                <span className="underline underline-offset-2">request id</span>{" "}
+                <span className="font-mono text-xs">{requestId}</span>; keep it
+                if you contact support.
+              </>
+            )}
           </p>
         )}
       </section>
@@ -191,4 +228,23 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
       </div>
     </div>
   );
+}
+
+/** Per-code guidance for POST /v1/onramps failures, per the response matrix. */
+function explainCreateError(error: ApiError): string {
+  switch (error.code) {
+    case "IDEMPOTENCY_KEY_REUSED":
+      return "This request was already sent with different values. Start a fresh order below.";
+    case "INSUFFICIENT_LIQUIDITY":
+      return "Testnet inventory is temporarily low. Try again later.";
+    case "AMOUNT_OUT_OF_RANGE":
+      return "The amount is outside the supported range. Typical bounds are 10.000 to 10.000.000 idr.";
+    case "INVALID_STELLAR_ACCOUNT":
+      return "The destination is not a valid Stellar testnet address.";
+    case "QUOTE_UNAVAILABLE":
+    case "EXTERNAL_SERVICE_UNAVAILABLE":
+      return `${error.message} This is usually temporary; retry in a moment.`;
+    default:
+      return error.code !== null ? `${error.code}: ${error.message}` : error.message;
+  }
 }

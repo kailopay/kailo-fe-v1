@@ -104,9 +104,9 @@ export default async function Home() {
           <SandboxBadges />
           <Link
             className="rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-paper transition-colors hover:bg-ink-deep"
-            href={hasSession ? "/profile" : "/login"}
+            href={hasSession ? "/dashboard" : "/login"}
           >
-            {hasSession ? "Signed in" : "Sign in"}
+            {hasSession ? "Dashboard" : "Sign in"}
           </Link>
         </div>
       </header>
@@ -131,9 +131,9 @@ export default async function Home() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
               className="flex h-12 items-center justify-center rounded-xl bg-ink px-7 font-medium text-paper transition-colors hover:bg-ink-deep"
-              href={hasSession ? "/profile" : "/login"}
+              href={hasSession ? "/dashboard" : "/login"}
             >
-              {hasSession ? "Continue to your profile" : "Sign in to the playground"}
+              {hasSession ? "Continue to your dashboard" : "Sign in to the playground"}
             </Link>
             <Link
               className="flex h-12 items-center justify-center rounded-xl border border-line-strong px-7 font-medium text-ink transition-colors hover:border-ink"
@@ -214,9 +214,9 @@ export default async function Home() {
           <div className="mt-8">
             <Link
               className="inline-flex h-12 items-center justify-center rounded-xl bg-ink px-7 font-medium text-paper transition-colors hover:bg-ink-deep"
-              href={hasSession ? "/profile" : "/login"}
+              href={hasSession ? "/dashboard" : "/login"}
             >
-              {hasSession ? "Continue to your profile" : "Sign in"}
+              {hasSession ? "Continue to your dashboard" : "Sign in"}
             </Link>
           </div>
         </div>

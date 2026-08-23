@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { formatIdr, parseIdrInput } from "@/lib/format-money";
+import { formatIdr, formatIdrInput, parseIdrInput } from "@/lib/format-money";
 import type { PaymentMethod } from "@/lib/api/types";
 
 const STELLAR_ACCOUNT_PATTERN = /^G[A-Z2-7]{55}$/;
@@ -61,7 +61,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
           className="h-11 rounded-xl border border-line-strong bg-white px-4 font-mono text-sm tnum outline-none transition-colors focus:border-sky-deep"
           id="amount"
           inputMode="numeric"
-          onChange={(event) => setAmountDisplay(event.target.value)}
+          onChange={(event) => setAmountDisplay(formatIdrInput(event.target.value))}
           placeholder="1.000.000"
           value={amountDisplay}
         />

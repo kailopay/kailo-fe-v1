@@ -19,7 +19,7 @@ export function LoginForm() {
       await loginAccount({ email: email.trim(), password });
       // Hard navigation: the fresh tree hydrates with the new session cookie.
       // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-      window.location.assign("/profile");
+      window.location.assign("/dashboard");
     } catch (caught) {
       if (caught instanceof ApiError && caught.status === 403) {
         // "email is not verified": a prompt to verify, never a password error.
