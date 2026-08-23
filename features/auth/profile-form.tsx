@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ApiError, apiRequest } from "@/lib/api/client";
+import { ApiError, apiRequest, isSessionGone } from "@/lib/api/client";
 import { parseUser } from "@/lib/api/client";
 import type { User } from "@/lib/api/types";
 
@@ -31,6 +31,12 @@ export function ProfileForm({ initialDisplayName, initialDeveloperEnabled }: Pro
       setDeveloperEnabled(user.developer_enabled);
       setNotice("Saved");
     } catch (caught) {
+      if (isSessionGone(caught)) {
+        // The cookie is gone: leave the app for the public explainer.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/session-expired");
+        return;
+      }
       if (caught instanceof ApiError) {
         setError(caught.message);
       } else if (caught instanceof Error) {

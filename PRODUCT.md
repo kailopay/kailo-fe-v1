@@ -34,8 +34,10 @@ UI never implies real settlement, KYC, or production readiness.
 
 ## Operating Context
 
-- Auth is a backend-owned BFF flow through Auth0; the browser holds only an
-  opaque `kailopay_session` cookie (HttpOnly, SameSite=Lax).
+- Auth is self-hosted email + password (backend ADR-002; Auth0 was removed),
+  with optional Google sign-in while credentials are configured; the browser
+  holds only an opaque `kailopay_session` cookie (HttpOnly, SameSite=Lax).
+  Verification and reset links are logged to the backend console in sandbox.
 - API keys follow `pk_test_<public_id>_<secret>` and are shown in full
   exactly once at creation.
 - Orders are created with an `Idempotency-Key` and settle asynchronously:

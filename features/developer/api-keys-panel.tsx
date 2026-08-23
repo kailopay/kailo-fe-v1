@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ApiError, apiRequest, parseApiKeyCreated } from "@/lib/api/client";
+import { ApiError, apiRequest, isSessionGone, parseApiKeyCreated } from "@/lib/api/client";
 import type { ApiKeyCreated, ApiKeyMeta } from "@/lib/api/types";
 import { formatDate } from "./format-date";
 
@@ -28,6 +28,12 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
       setCreated(parseApiKeyCreated(payload));
       setName("");
     } catch (caught) {
+      if (isSessionGone(caught)) {
+        // The cookie is gone: leave the app for the public explainer.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/session-expired");
+        return;
+      }
       setError(readError(caught));
     } finally {
       setCreating(false);
@@ -63,6 +69,12 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
       setRevokingId(null);
       router.refresh();
     } catch (caught) {
+      if (isSessionGone(caught)) {
+        // The cookie is gone: leave the app for the public explainer.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/session-expired");
+        return;
+      }
       setError(readError(caught));
     } finally {
       setCreating(false);

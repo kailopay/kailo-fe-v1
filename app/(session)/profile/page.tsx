@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AvatarSection } from "@/features/auth/avatar-section";
+import { ChangePasswordForm } from "@/features/auth/change-password-form";
 import { ProfileForm } from "@/features/auth/profile-form";
 import { getServerSession } from "@/lib/api/server";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const user = await getServerSession();
-  if (user === null) redirect("/auth/login");
+  if (user === null) redirect("/login");
 
   return (
     <div className="max-w-xl">
@@ -25,6 +26,7 @@ export default async function ProfilePage() {
         initialDeveloperEnabled={user.developer_enabled}
         initialDisplayName={user.display_name}
       />
+      <ChangePasswordForm />
     </div>
   );
 }

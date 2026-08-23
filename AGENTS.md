@@ -14,10 +14,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ```
 app/                  # Routing ONLY — layouts, pages, route handlers; pages stay thin
+  (auth)/             # Route group: public auth screens (own bare layout)
+    login/            # /login: email + password sign-in
+    register/         # /register: create an account, then verify prompt
+    auth/
+      verify-email/   # /auth/verify-email: consumes the console-link token
+      reset-password/ # /auth/reset-password: consumes the reset-link token
   (session)/          # Route group: session app shell (nav + sandbox badges)
-    profile/          # /profile: display name, Developer Mode, avatar
+    profile/          # /profile: display name, password, Developer Mode, avatar
     developer/        # /developer: API keys; playground/ + orders/[id]/; _components/ colocated
-  session-expired/    # Public 401 explainer (NOT under /auth: backend owns that path)
+  session-expired/    # Public 401 explainer
 components/           # Shared UI across routes/features (ui/ = primitives)
 features/             # Feature modules (auth, developer, orders): components + hooks + utils + types colocated
 hooks/                # React hooks shared across features
@@ -40,8 +46,10 @@ public/               # Static assets
 
 Contract authority: `kailopay-be/openapi/openapi.yaml` (sibling repo). Frontend guide: `documentations/FRONTEND-GUIDE.md`. Wire types live in `lib/api/types.ts`.
 
-- `/auth`, `/v1`, `/livez`, `/readyz`, `/startupz` are proxied to the backend via `rewrites` in `next.config.ts` (origin: `API_ORIGIN`, default `http://localhost:8080`). The backend sends no CORS headers by design. Never create frontend routes under those paths.
-- Login is full-window navigation to `/auth/login` (plain `<a>`, never `next/link`). There is no `/register` route: Auth0 owns account creation. Treat 401 as "redirect to sign-in".
+- `/auth` is split: the enumerated backend API paths (`/auth/register`, `/auth/login`, `/auth/logout`, `/auth/email/*`, `/auth/password/*`, `/auth/google/*`, `/auth/me`, `/auth/me/avatar`), plus `/v1`, `/livez`, `/readyz`, `/startupz`, are proxied to the backend via `rewrites` in `next.config.ts` (origin: `API_ORIGIN`, default `http://localhost:8081`). The backend sends no CORS headers by design. The frontend owns pages at `/auth/verify-email` and `/auth/reset-password`; never add other pages under `/auth` without updating the rewrite list.
+- Auth is self-hosted email + password with opaque server sessions (backend ADR-002; Auth0 was removed). The frontend owns the forms: `/login`, `/register`, and the token pages above. Login (`POST /auth/login`) sets an HttpOnly cookie; nothing auth-related is stored in app state; hydrate from `GET /auth/me`. Treat 401 as "redirect to sign-in" (`/login`, or `/session-expired` mid-session).
+- Google sign-in is a full-window navigation to `/auth/google/login` (plain `<a>`, never `next/link`). It 503s while unconfigured: probe it before rendering the button, and show a reserved non-button slot otherwise.
+- Verification and reset links are logged to the backend console in sandbox, never emailed. UI copy says "delivered via the sandbox console", never "check your email". Login 403 "email is not verified" routes to the verify prompt, never to a password error. 401 "invalid email or password" also covers lockout: never hint which part failed.
 - Money and XLM amounts are decimal strings end to end. Never convert to JS numbers for arithmetic.
 - JSON bodies must contain only documented fields: the backend rejects unknown keys with 400.
 - The backend has two error envelope styles; `ApiError` (lib/api) normalizes both. Surface `code`, keep `request_id` for support copy.

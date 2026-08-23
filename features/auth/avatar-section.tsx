@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ApiError, apiRequest, apiUpload, parseUser } from "@/lib/api/client";
+import { ApiError, apiRequest, apiUpload, isSessionGone, parseUser } from "@/lib/api/client";
 
 type AvatarSectionProps = { initialHasAvatar: boolean };
 
@@ -35,6 +35,12 @@ export function AvatarSection({ initialHasAvatar }: AvatarSectionProps) {
       setHasAvatar(true);
       setVersion((current) => current + 1);
     } catch (caught) {
+      if (isSessionGone(caught)) {
+        // The cookie is gone: leave the app for the public explainer.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/session-expired");
+        return;
+      }
       setError(caught instanceof ApiError ? caught.message : "Could not reach the server. Try again.");
     } finally {
       setBusy(false);
@@ -48,6 +54,12 @@ export function AvatarSection({ initialHasAvatar }: AvatarSectionProps) {
       await apiRequest("/auth/me/avatar", { method: "DELETE" });
       setHasAvatar(false);
     } catch (caught) {
+      if (isSessionGone(caught)) {
+        // The cookie is gone: leave the app for the public explainer.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+        window.location.assign("/session-expired");
+        return;
+      }
       setError(caught instanceof ApiError ? caught.message : "Could not reach the server. Try again.");
     } finally {
       setBusy(false);

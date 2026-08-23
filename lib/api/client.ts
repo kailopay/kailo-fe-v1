@@ -134,6 +134,65 @@ export async function getSession(): Promise<User> {
   return parseUser(await apiRequest("/auth/me"));
 }
 
+/**
+ * True when a session-authenticated call came back 401: the cookie is gone.
+ * Callers redirect to sign-in; nothing auth-related is held in app state.
+ */
+export function isSessionGone(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 401;
+}
+
+/** Flow A: register. 201 returns the unverified user; 409 = email taken. */
+export function registerAccount(request: {
+  email: string;
+  password: string;
+  display_name?: string;
+}): Promise<User> {
+  const body =
+    request.display_name === undefined
+      ? { email: request.email, password: request.password }
+      : { email: request.email, password: request.password, display_name: request.display_name };
+  return parseUserAsync(apiRequest("/auth/register", { body }));
+}
+
+/** Flow C: login. 200 returns the user and sets the session cookie. */
+export function loginAccount(request: { email: string; password: string }): Promise<User> {
+  return parseUserAsync(apiRequest("/auth/login", { body: request }));
+}
+
+/** Flow B: consume a single-use email verification token. */
+export function verifyEmailToken(token: string): Promise<User> {
+  return parseUserAsync(apiRequest("/auth/email/verify", { body: { token } }));
+}
+
+/** Always 202; never reveals whether the account exists. */
+export function resendVerificationEmail(email: string): Promise<null> {
+  return apiRequest("/auth/email/resend", { body: { email } }) as Promise<null>;
+}
+
+/** Always 202; never reveals whether the account exists. */
+export function requestPasswordReset(email: string): Promise<null> {
+  return apiRequest("/auth/password/forgot", { body: { email } }) as Promise<null>;
+}
+
+/** Flow D: consume a reset token. 204; every session is revoked. */
+export function resetPasswordWithToken(token: string, newPassword: string): Promise<null> {
+  return apiRequest("/auth/password/reset", {
+    body: { token, new_password: newPassword },
+  }) as Promise<null>;
+}
+
+/** Flow E: change password. 204; the current session is revoked too. */
+export function changePassword(currentPassword: string, newPassword: string): Promise<null> {
+  return apiRequest("/auth/password/change", {
+    body: { current_password: currentPassword, new_password: newPassword },
+  }) as Promise<null>;
+}
+
+async function parseUserAsync(payload: Promise<unknown>): Promise<User> {
+  return parseUser(await payload);
+}
+
 function malformed(what: string): ApiError {
   return new ApiError(`Malformed payload: ${what}`, 0, "MALFORMED_RESPONSE", null);
 }

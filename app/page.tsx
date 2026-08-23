@@ -102,13 +102,12 @@ export default async function Home() {
         <div className="flex items-center gap-4">
           <span className="hidden font-mono text-xs text-ink-3 sm:block">v0.1.0</span>
           <SandboxBadges />
-          {/* Full-window navigation: the backend owns the Auth0 round-trip. */}
-          <a
+          <Link
             className="rounded-full bg-ink px-4 py-1.5 text-sm font-medium text-paper transition-colors hover:bg-ink-deep"
-            href="/auth/login"
+            href={hasSession ? "/profile" : "/login"}
           >
             {hasSession ? "Signed in" : "Sign in"}
-          </a>
+          </Link>
         </div>
       </header>
 
@@ -130,13 +129,12 @@ export default async function Home() {
             money moves, ever.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            {/* Full-window navigation: the backend owns the Auth0 round-trip. */}
-            <a
+            <Link
               className="flex h-12 items-center justify-center rounded-xl bg-ink px-7 font-medium text-paper transition-colors hover:bg-ink-deep"
-              href="/auth/login"
+              href={hasSession ? "/profile" : "/login"}
             >
               {hasSession ? "Continue to your profile" : "Sign in to the playground"}
-            </a>
+            </Link>
             <Link
               className="flex h-12 items-center justify-center rounded-xl border border-line-strong px-7 font-medium text-ink transition-colors hover:border-ink"
               href="#how-it-settles"
@@ -145,8 +143,8 @@ export default async function Home() {
             </Link>
           </div>
           <p className="mt-6 font-mono text-xs leading-5 text-ink-3">
-            developer sandbox · orders need a pk_test key · sessions via
-            auth0, held server-side
+            developer sandbox · orders need a pk_test key · sessions are
+            self-hosted, held server-side
           </p>
         </div>
       </section>
@@ -214,13 +212,12 @@ export default async function Home() {
             otherwise.
           </p>
           <div className="mt-8">
-            {/* Full-window navigation: the backend owns the Auth0 round-trip. */}
-            <a
+            <Link
               className="inline-flex h-12 items-center justify-center rounded-xl bg-ink px-7 font-medium text-paper transition-colors hover:bg-ink-deep"
-              href="/auth/login"
+              href={hasSession ? "/profile" : "/login"}
             >
               {hasSession ? "Continue to your profile" : "Sign in"}
-            </a>
+            </Link>
           </div>
         </div>
       </section>

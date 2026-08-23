@@ -16,7 +16,7 @@ export function SignOutButton() {
     // A hard reload is required on sign-out: it wipes all client state,
     // including any playground API key held in memory.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = "/";
+    window.location.href = "/login";
   }
 
   return (

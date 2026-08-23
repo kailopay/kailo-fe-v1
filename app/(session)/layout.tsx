@@ -12,7 +12,7 @@ const navItems = [
 
 export default async function SessionLayout({ children }: { children: React.ReactNode }) {
   const user = await getServerSession();
-  if (user === null) redirect("/auth/login");
+  if (user === null) redirect("/login");
 
   return (
     <div className="flex flex-1">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SandboxBadges } from "@/components/sandbox-badges";
 import { ForgotPassword } from "@/features/auth/forgot-password";
 
@@ -15,13 +16,12 @@ export default function SessionExpiredPage() {
         Sign in again to continue. Your sandbox orders and API keys are not
         affected.
       </p>
-      {/* Full-window navigation: the backend owns the Auth0 round-trip. */}
-      <a
+      <Link
         className="flex h-12 items-center justify-center rounded-xl bg-ink px-7 font-medium text-paper transition-colors hover:bg-ink-deep"
-        href="/auth/login"
+        href="/login"
       >
         Sign in
-      </a>
+      </Link>
       <ForgotPassword />
     </div>
   );

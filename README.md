@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kailopay-fe
 
-## Getting Started
+The web app for [KailoPay](https://github.com/), an Indonesia-first sandbox
+on-ramp that converts IDR into Stellar testnet XLM. Sandbox only: no real
+money moves, and every value screen says so.
 
-First, run the development server:
+## Stack
+
+Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4. Chosen for
+the 30-day sandbox window: the App Router gives Server Components for
+session-hydrated pages, and `rewrites` provide the same-origin API proxy the
+backend requires (it sends no CORS headers by design).
+
+## Running
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The dev server runs on http://localhost:3001, the origin the backend's
+`AUTH_EMAIL_LINK_BASE_URL` and `AUTH_SUCCESS_REDIRECT_URL` point at.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Requirements:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- The KailoPay backend (sibling repo `kailopay-be`) running on
+  `http://localhost:8081`, or set `API_ORIGIN` to its address.
+- Verification and password-reset links are logged to the backend console in
+  sandbox, not emailed: copy the token from the backend terminal into the
+  `/auth/verify-email` or `/auth/reset-password` page.
 
-## Learn More
+## Auth model
 
-To learn more about Next.js, take a look at the following resources:
+Self-hosted email + password with opaque server sessions (backend ADR-002;
+Auth0 was removed). The frontend owns the forms:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/register` creates an unverified account, then shows the verify prompt
+  with a resend action.
+- `/auth/verify-email?token=...` consumes the single-use token.
+- `/login` signs in with email + password; 403 routes to the verify prompt,
+  401 never reveals whether the email or the password was wrong.
+- `/auth/reset-password?token=...` sets a new password (revokes all
+  sessions); the profile page offers an in-session change that signs out
+  every device.
+- Google sign-in is a redirect flow that appears only when the backend has
+  credentials configured; otherwise its slot on the auth card stays reserved.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Layout
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `AGENTS.md` for the full conventions. In short: `app/` is routing only,
+feature modules live in `features/`, shared non-UI logic in `lib/` (the typed
+API client lives in `lib/api/`). Contract authority is
+`../kailopay-be/openapi/openapi.yaml`; the frontend-facing guide is
+`documentations/FRONTEND-GUIDE.md`.

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function DeveloperPage() {
   const user = await getServerSession();
-  if (user === null) redirect("/auth/login");
+  if (user === null) redirect("/login");
 
   if (!user.developer_enabled) {
     return (
