@@ -2,6 +2,7 @@
 
 :root {
   --paper: #fdfcfa;
+  --milk: #fff8ee;
   --paper-recess: #f2f4f8;
   --cloud: #f3f7ff;
   --ink: #0f1e38;
@@ -26,6 +27,24 @@
   --brass-text: #7d5c05;
   --brass-deep: #654c04;
   --gold: #d9a441;
+  --coral: #ff6b57;
+  --coral-deep: #b63e32;
+  --coral-tint: #fff0ec;
+  --aqua: #18c7b7;
+  --aqua-deep: #087b73;
+  --aqua-tint: #e5faf5;
+  --lilac: #8d7cff;
+  --lilac-deep: #5d4ec7;
+  --lilac-tint: #f0eeff;
+  --mango: #ffc857;
+  --mango-deep: #9b6900;
+  --mango-tint: #fff6d9;
+  --surface: #ffffff;
+  --surface-2: #f7f8fb;
+  --accent-tint: #e8f2ff;
+  --accent-text: #2b6cb8;
+  --st-red-bg: #fff0ee;
+  --st-red: #b63e32;
   --ink-plate: #101f3a;
   --plate-line: #2c3c5c;
   --paper-on-plate: #f0f4fb;
@@ -33,6 +52,7 @@
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-milk: var(--milk);
   --color-paper-recess: var(--paper-recess);
   --color-cloud: var(--cloud);
   --color-ink: var(--ink);
@@ -57,11 +77,29 @@
   --color-brass-text: var(--brass-text);
   --color-brass-deep: var(--brass-deep);
   --color-gold: var(--gold);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-coral-tint: var(--coral-tint);
+  --color-aqua: var(--aqua);
+  --color-aqua-deep: var(--aqua-deep);
+  --color-aqua-tint: var(--aqua-tint);
+  --color-lilac: var(--lilac);
+  --color-lilac-deep: var(--lilac-deep);
+  --color-lilac-tint: var(--lilac-tint);
+  --color-mango: var(--mango);
+  --color-mango-deep: var(--mango-deep);
+  --color-mango-tint: var(--mango-tint);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-accent-tint: var(--accent-tint);
+  --color-accent-text: var(--accent-text);
+  --color-st-red-bg: var(--st-red-bg);
+  --color-st-red: var(--st-red);
   --color-ink-plate: var(--ink-plate);
   --color-plate-line: var(--plate-line);
   --color-paper-on-plate: var(--paper-on-plate);
-  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-sans);
 }
 
 /* One light world: near-white ground, navy ink, pastel state colors. */
@@ -73,6 +111,11 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
+}
+
+html,
+body {
+  overflow-x: clip;
 }
 
 ::selection {

@@ -4,12 +4,12 @@ import { ConsumerFlow } from "@/features/consumer/consumer-flow";
 import { getServerSession } from "@/lib/api/server";
 
 export const metadata: Metadata = {
-  title: "Move money",
+  title: "Sell XLM",
 };
 
-export default async function DashboardPage() {
+export default async function SellPage() {
   const user = await getServerSession();
   if (user === null) redirect("/login");
 
-  return <ConsumerFlow displayName={user.display_name} initialDirection="buy" />;
+  return <ConsumerFlow displayName={user.display_name} initialDirection="sell" />;
 }
