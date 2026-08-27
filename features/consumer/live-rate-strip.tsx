@@ -8,17 +8,18 @@ type LiveRateStripProps = {
 
 export function LiveRateStrip({ direction, quote }: LiveRateStripProps): React.ReactElement {
   const state = rateLabel(quote);
+  const isSell = direction === "sell";
 
   return (
-    <section className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-y border-mango/45 py-4" aria-label={`${direction === "buy" ? "Buy" : "Sell"} exchange rate`}>
-      <div className="flex items-start gap-3">
-        <span aria-hidden className="mt-1 h-3 w-3 rounded-md bg-mango" />
-        <div>
-          <p className="text-sm font-bold text-ink">{quote === null ? "Live exchange rate" : "Locked exchange rate"}</p>
-          <p className="mt-1 text-xs leading-5 text-mango-deep">{state.detail}</p>
+    <section className="kp-status-line" aria-label={`${isSell ? "Sell" : "Buy"} exchange rate`}>
+      <div className="flex min-w-0 items-center gap-3">
+        <span aria-hidden className="kp-status-mark" data-tone={isSell ? "sell" : "buy"} />
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-ink">{state.label}</p>
+          <p className="mt-1 text-xs leading-5 text-ink-3">{state.detail}</p>
         </div>
       </div>
-      <p className="tnum text-right text-sm font-bold text-ink">
+      <p className="tnum shrink-0 text-right text-sm font-bold text-ink">
         {quote === null ? "Shown at checkout" : `1 XLM = ${quote.adjusted_rate} IDR`}
       </p>
     </section>

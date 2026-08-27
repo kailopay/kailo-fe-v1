@@ -1,0 +1,92 @@
+/* Hallmark · macrostructure: Workbench · tone: warm editorial · anchor hue: coral */
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
+
+:root {
+  --paper: oklch(97.5% 0.012 86);
+  --milk: oklch(98.7% 0.008 86);
+  --paper-recess: oklch(94.8% 0.018 88);
+  --cloud: oklch(96.8% 0.012 230);
+  --ink: oklch(24% 0.035 255);
+  --ink-deep: oklch(18% 0.04 255);
+  --ink-2: oklch(44% 0.035 255);
+  --ink-3: oklch(61% 0.028 255);
+  --line: oklch(88% 0.018 255);
+  --line-strong: oklch(71% 0.038 255);
+
+  --coral: oklch(67% 0.18 36);
+  --coral-deep: oklch(43% 0.14 34);
+  --coral-tint: oklch(93.5% 0.04 36);
+  --aqua: oklch(71% 0.13 172);
+  --aqua-deep: oklch(42% 0.1 172);
+  --aqua-tint: oklch(94% 0.035 172);
+  --lilac: oklch(78% 0.1 300);
+  --lilac-deep: oklch(46% 0.1 300);
+  --lilac-tint: oklch(94.5% 0.025 300);
+  --mango: oklch(82% 0.12 82);
+  --mango-deep: oklch(45% 0.1 75);
+  --mango-tint: oklch(96% 0.035 82);
+
+  /* Compatibility aliases for the existing order workspace. */
+  --sky: oklch(70% 0.11 235);
+  --sky-deep: oklch(43% 0.1 235);
+  --sky-tint: oklch(94% 0.03 235);
+  --sea: var(--aqua);
+  --sea-deep: var(--aqua-deep);
+  --sea-tint: var(--aqua-tint);
+  --orchid: var(--lilac);
+  --orchid-deep: var(--lilac-deep);
+  --orchid-tint: var(--lilac-tint);
+  --sun: var(--mango);
+  --sun-deep: var(--mango-deep);
+  --sun-tint: var(--mango-tint);
+  --brass: oklch(61% 0.12 75);
+  --brass-text: oklch(45% 0.1 75);
+  --brass-deep: oklch(37% 0.09 75);
+  --gold: oklch(76% 0.13 80);
+
+  --surface: oklch(99.4% 0.004 90);
+  --surface-2: oklch(96% 0.012 255);
+  --accent-tint: var(--coral-tint);
+  --accent-text: var(--coral-deep);
+  --st-red-bg: oklch(94% 0.035 30);
+  --st-red: oklch(45% 0.14 30);
+  --ink-plate: var(--ink-deep);
+  --plate-line: oklch(34% 0.05 255);
+  --paper-on-plate: oklch(96% 0.015 255);
+
+  --kp-font-sans: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --kp-font-display: var(--kp-font-sans);
+  --kp-font-mono: var(--kp-font-sans);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-display: clamp(2.9rem, 7vw, 5.75rem);
+
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-pill: 999px;
+  --rule-thin: 1px solid var(--line);
+  --focus-ring: var(--coral-deep);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 520ms;
+}

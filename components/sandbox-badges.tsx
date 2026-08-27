@@ -1,25 +1,8 @@
-export function SandboxBadges({ onPlate = false }: { onPlate?: boolean }) {
-  if (onPlate) {
-    return (
-      <div aria-label="Sandbox environment notice" className="flex items-center gap-2">
-        <span className="rounded-full bg-mango/20 px-2.5 py-0.5 text-xs font-medium text-mango">
-          Sandbox
-        </span>
-        <span className="rounded-full bg-lilac/20 px-2.5 py-0.5 text-xs font-medium text-lilac">
-          Stellar Testnet
-        </span>
-      </div>
-    );
-  }
-
+export function SandboxBadges({ onPlate = false }: { onPlate?: boolean }): React.ReactElement {
   return (
-    <div aria-label="Sandbox environment notice" className="flex items-center gap-2">
-      <span className="rounded-full bg-mango-tint px-2.5 py-0.5 text-xs font-medium text-mango-deep">
-        Sandbox
-      </span>
-      <span className="rounded-full bg-lilac-tint px-2.5 py-0.5 text-xs font-medium text-lilac-deep">
-        Stellar Testnet
-      </span>
+    <div aria-label="Sandbox environment notice" className="kp-environment-badges" data-on-plate={onPlate}>
+      <span className="kp-environment-badge" data-tone="sandbox">Sandbox</span>
+      <span className="kp-environment-badge" data-tone="testnet">Stellar Testnet</span>
     </div>
   );
 }
