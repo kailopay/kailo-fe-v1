@@ -78,8 +78,8 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
                     </span>
                     <span className="text-sm font-semibold tnum text-ink">
                       {order.direction === "onramp"
-                        ? `${formatIdr(order.fiat.amount_minor)} IDR → ${order.asset.amount} XLM`
-                        : `${order.asset.amount} XLM → ${formatIdr(order.fiat.amount_minor)} IDR`}
+                        ? `${formatIdr(order.fiat.amount_minor)} IDR to ${order.asset.amount} XLM`
+                        : `${order.asset.amount} XLM to ${formatIdr(order.fiat.amount_minor)} IDR`}
                     </span>
                   </div>
                   <span className="text-xs text-ink-3">

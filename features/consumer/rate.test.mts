@@ -34,8 +34,8 @@ test("a quote with a future expiry is presented as locked", () => {
 
 test("an absent quote is explained without inventing a live price", () => {
   assert.deepEqual(rateLabel(null, Date.parse("2026-08-28T10:02:00.000Z")), {
-    label: "Rate appears when you continue",
-    detail: "The backend secures the quote when the order is created",
+    label: "Live rate at checkout",
+    detail: "The rate is secured when the order is created",
   });
 });
 

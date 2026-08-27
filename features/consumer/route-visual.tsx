@@ -2,36 +2,38 @@ import { directionLabels, type ConsumerDirection } from "./rate";
 
 type RouteVisualProps = {
   direction: ConsumerDirection;
-  sourceAmount: string;
-  destinationAmount: string;
 };
 
-export function RouteVisual({ direction, sourceAmount, destinationAmount }: RouteVisualProps): React.ReactElement {
+export function RouteVisual({ direction }: RouteVisualProps): React.ReactElement {
   const labels = directionLabels(direction);
-  const accent = direction === "buy" ? "coral" : "aqua";
+  const isBuy = direction === "buy";
+  const tone = isBuy
+    ? {
+        chip: "bg-coral/35 text-coral-deep",
+        rail: "bg-coral/50",
+        centre: "ring-coral/25",
+      }
+    : {
+        chip: "bg-aqua/35 text-aqua-deep",
+        rail: "bg-aqua/50",
+        centre: "ring-aqua/25",
+      };
 
   return (
-    <div
-      aria-label={`${labels.source} to ${labels.destination} route`}
-      className={`rounded-[28px] border p-5 sm:p-6 ${accent === "coral" ? "border-coral/35 bg-coral-tint" : "border-aqua/35 bg-aqua-tint"}`}
-    >
-      <div className="flex items-center justify-between gap-4 text-xs font-bold tracking-[0.12em] text-ink-2">
-        <span>{labels.source}</span>
-        <span className="flex items-center gap-2">
-          <span aria-hidden className={`h-2 w-2 rounded-full ${accent === "coral" ? "bg-coral" : "bg-aqua"}`} />
-          route
-        </span>
-        <span>{labels.destination}</span>
-      </div>
-      <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-end gap-3">
+    <div aria-label={`${labels.source} to ${labels.destination} route`} className="rounded-[24px] bg-white/55 p-4 sm:p-5">
+      <div className="flex items-center gap-3 sm:gap-5">
         <div className="min-w-0">
-          <p className="truncate text-2xl font-bold tracking-[-0.04em] text-ink sm:text-3xl">{sourceAmount || "0"}</p>
-          <p className="mt-1 text-sm font-semibold text-ink-2">{labels.source}</p>
+          <span className={`inline-flex rounded-xl px-3 py-2 text-sm font-bold ${tone.chip}`}>{labels.source}</span>
+          <p className="mt-2 truncate text-xs font-semibold text-ink-2">{isBuy ? "Your rupiah" : "Your XLM"}</p>
         </div>
-        <span aria-hidden className={`pb-5 text-2xl font-bold ${accent === "coral" ? "text-coral-deep" : "text-aqua-deep"}`}>→</span>
+        <div aria-hidden className="relative flex min-w-[56px] flex-1 items-center">
+          <span className={`h-1.5 flex-1 rounded-full ${tone.rail}`} />
+          <span className={`mx-[-0.2rem] flex h-8 w-8 shrink-0 rounded-full bg-white ring-4 ${tone.centre}`} />
+          <span className={`h-1.5 flex-1 rounded-full ${tone.rail}`} />
+        </div>
         <div className="min-w-0 text-right">
-          <p className="truncate text-2xl font-bold tracking-[-0.04em] text-ink sm:text-3xl">{destinationAmount || "0"}</p>
-          <p className="mt-1 text-sm font-semibold text-ink-2">{labels.destination}</p>
+          <span className={`inline-flex rounded-xl px-3 py-2 text-sm font-bold ${tone.chip}`}>{labels.destination}</span>
+          <p className="mt-2 truncate text-xs font-semibold text-ink-2">{isBuy ? "Stellar testnet" : "Sandbox payout"}</p>
         </div>
       </div>
     </div>

@@ -14,9 +14,11 @@ export function NetworkSelector(): React.ReactElement {
         onClick={() => setOpen((current) => !current)}
         type="button"
       >
-        <span aria-hidden className="h-2 w-2 rounded-full bg-lilac" />
+        <span aria-hidden className="h-2 w-2 rounded-[3px] bg-lilac" />
         Testnet
-        <span aria-hidden className="text-xs">⌄</span>
+        <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 16 16">
+          <path d="m4 6 4 4 4-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+        </svg>
       </button>
       {open && (
         <div
@@ -29,14 +31,14 @@ export function NetworkSelector(): React.ReactElement {
             role="option"
             type="button"
           >
-            <span aria-hidden className="mt-1.5 h-2 w-2 rounded-full bg-lilac" />
+            <span aria-hidden className="mt-1.5 h-2 w-2 rounded-[3px] bg-lilac" />
             <span>
               <span className="block text-sm font-semibold text-ink">Stellar Testnet</span>
               <span className="mt-0.5 block text-xs leading-5 text-ink-3">Sandbox network</span>
             </span>
           </button>
           <div aria-disabled="true" aria-selected="false" className="mt-1 flex items-start gap-3 rounded-xl px-3 py-2.5 opacity-55" role="option">
-            <span aria-hidden className="mt-1.5 h-2 w-2 rounded-full bg-line-strong" />
+            <span aria-hidden className="mt-1.5 h-2 w-2 rounded-[3px] bg-line-strong" />
             <span>
               <span className="block text-sm font-semibold text-ink-2">Mainnet</span>
               <span className="mt-0.5 block text-xs leading-5 text-ink-3">Available in a later release</span>

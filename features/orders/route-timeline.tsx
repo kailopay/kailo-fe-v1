@@ -13,7 +13,11 @@ export function RouteTimeline({ view }: RouteTimelineProps): React.ReactElement 
             <span aria-hidden className="absolute left-3 top-7 hidden h-px w-[calc(100%-0.75rem)] bg-line sm:block" />
           )}
           <span className={`relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${stepTone(step.state)}`}>
-            {step.state === "complete" ? "✓" : index + 1}
+            {step.state === "complete" ? (
+              <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 16 16">
+                <path d="m3 8.5 3 3L13 4.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.75" />
+              </svg>
+            ) : index + 1}
           </span>
           <span className="relative mt-0.5 text-sm font-semibold text-ink sm:mt-3 sm:block">{step.label}</span>
         </li>

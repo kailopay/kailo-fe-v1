@@ -18,26 +18,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         {/*
-          THESIS: KailoPay is a printed star atlas for one money corridor: a
-          monochrome proof-sheet system whose only figure is a compass,
-          proving sandbox honesty can be the most crafted object in the room.
-          It refuses the crypto gradient hero.
-          OWN-WORLD: warm paper ground, ink scale, one brass accent, hairline
-          chart rules, IBM Plex Mono annotations under Plus Jakarta Sans; the
-          star compass plate with its plotted IDR-to-XLM bearing is
-          recognizable with all copy removed.
-          STORY: a developer sees the corridor plotted, believes the
-          engineering is real because every claim sits beside a proving
-          artifact, and signs in.
-          FIRST VIEWPORT: masthead with sandbox stamp; the compass plate fills
-          the left two thirds, bearing drawn from the IDR port to the XLM star
-          over a horizon of status stars; headline right: "Rupiah in. Testnet
-          XLM out."; the primary action fills brass.
-          FORM: user-pinned fusion of the monochrome proof sheet and the star
-          compass, roll seed 00a920e9 re-roll 1.
-          FINISH: unreviewed and undocumented is unfinished; this build ends
-          with the finish review, the verdict, DESIGN.md, and every shipping
-          raster carrying its provenance
+          Consumer thesis: KailoPay is a soft exchange pocket for one clear
+          corridor. The first screen makes the direction, amount, destination,
+          and rate timing easy to read before the developer handoff.
+          Developer routes keep their own denser workspace so sandbox tools
+          stay useful without turning the consumer app into a console.
         */}
         {children}
       </body>

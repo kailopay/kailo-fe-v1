@@ -21,8 +21,8 @@ export function directionLabels(direction: ConsumerDirection): DirectionLabels {
 export function rateLabel(quote: Quote | null, now = Date.now()): RateLabel {
   if (quote === null) {
     return {
-      label: "Rate appears when you continue",
-      detail: "The backend secures the quote when the order is created",
+      label: "Live rate at checkout",
+      detail: "The rate is secured when the order is created",
     };
   }
 
