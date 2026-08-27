@@ -48,7 +48,7 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
     <section className="max-w-4xl">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-semibold">Order history</h2>
-        <p className="font-mono text-xs text-ink-3">scoped to this api key</p>
+        <p className="text-xs text-ink-3">Orders connected to this key</p>
       </div>
 
       {error !== null && (
@@ -73,11 +73,13 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
                   type="button"
                 >
                   <div className="flex items-center gap-3">
-                    <span className={`rounded-full px-3 py-1 font-mono text-xs ${style.pill}`}>
-                      {order.status}
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${style.pill}`}>
+                      {historyStatusLabel(order.status)}
                     </span>
-                    <span className="font-mono text-sm tnum text-ink">
-                      {formatIdr(order.fiat.amount_minor)} idr → {order.asset.amount} xlm
+                    <span className="text-sm font-semibold tnum text-ink">
+                      {order.direction === "onramp"
+                        ? `${formatIdr(order.fiat.amount_minor)} IDR → ${order.asset.amount} XLM`
+                        : `${order.asset.amount} XLM → ${formatIdr(order.fiat.amount_minor)} IDR`}
                     </span>
                   </div>
                   <span className="text-xs text-ink-3">
@@ -102,4 +104,8 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
       )}
     </section>
   );
+}
+
+function historyStatusLabel(status: Order["status"]): string {
+  return status.replaceAll("_", " ");
 }

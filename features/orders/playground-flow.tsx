@@ -2,23 +2,28 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { ApiError } from "@/lib/api/client";
-import { createOrder, getOrder, type CreateOrderInput } from "@/lib/api/orders";
-import type { Order } from "@/lib/api/types";
+import { createOfframp, createOrder, getOrder, type CreateOfframpInput, type CreateOrderInput } from "@/lib/api/orders";
+import type { Order, OrderDirection } from "@/lib/api/types";
 import { OrderCreateForm, type CreateOrderFormValue } from "./order-create-form";
+import { OfframpCreateForm, type CreateOfframpFormValue } from "./offramp-create-form";
 import { OrderDetail } from "./order-detail";
 import { OrderHistory } from "./order-history";
 
 const KEY_PATTERN = /^pk_test_/;
+type CreateRequest =
+  | { direction: "onramp"; input: CreateOrderInput }
+  | { direction: "offramp"; input: CreateOfframpInput };
 
 export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) {
   const [apiKey, setApiKey] = useState("");
   const [keyAccepted, setKeyAccepted] = useState(false);
+  const [direction, setDirection] = useState<OrderDirection>("onramp");
   const [creating, setCreating] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
-  const [retry, setRetry] = useState<{ input: CreateOrderInput } | null>(null);
-  const [hold, setHold] = useState<{ input: CreateOrderInput } | null>(null);
+  const [retry, setRetry] = useState<CreateRequest | null>(null);
+  const [hold, setHold] = useState<CreateRequest | null>(null);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   // Deep link (?order=<id>): fetch that order once the key is accepted.
@@ -27,7 +32,9 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
     let cancelled = false;
     getOrder(initialOrderId, apiKey)
       .then((found) => {
-        if (!cancelled) setOrder(found);
+        if (cancelled) return;
+        setOrder(found);
+        setDirection(found.direction);
       })
       .catch((caught) => {
         if (cancelled) return;
@@ -54,13 +61,16 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
     setKeyAccepted(true);
   }
 
-  async function submitOrder(input: CreateOrderInput): Promise<void> {
+  async function submitRequest(request: CreateRequest): Promise<void> {
     setCreating(true);
     setError(null);
     setRequestId(null);
     try {
-      const created = await createOrder(input);
+      const created = request.direction === "onramp"
+        ? await createOrder(request.input)
+        : await createOfframp(request.input);
       setOrder(created);
+      setDirection(created.direction);
       setRetry(null);
       setHold(null);
       setHistoryRefreshKey((current) => current + 1);
@@ -69,7 +79,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         // CHECKOUT_PENDING_RECONCILIATION: the order exists and is held
         // while the provider outcome settles. Never re-create it; the same
         // key+body replay returns the order once reconciliation finishes.
-        setHold({ input });
+        setHold(request);
         setRetry(null);
       } else if (caught instanceof ApiError) {
         setError(explainCreateError(caught));
@@ -80,7 +90,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
       } else if (caught instanceof Error) {
         // The outcome is unknown (network). Reuse the SAME idempotency key
         // so a retry can only replay this intent, never double-create.
-        setRetry({ input });
+        setRetry(request);
         setHold(null);
         setError("The request may or may not have reached the server. Retry safely with the same idempotency key.");
       }
@@ -89,23 +99,32 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
     }
   }
 
-  function handleCreate(value: CreateOrderFormValue): void {
+  function handleOnrampCreate(value: CreateOrderFormValue): void {
     const input: CreateOrderInput = {
       ...value,
       apiKey,
       idempotencyKey: crypto.randomUUID(),
     };
-    void submitOrder(input);
+    void submitRequest({ direction: "onramp", input });
+  }
+
+  function handleOfframpCreate(value: CreateOfframpFormValue): void {
+    const input: CreateOfframpInput = {
+      ...value,
+      apiKey,
+      idempotencyKey: crypto.randomUUID(),
+    };
+    void submitRequest({ direction: "offramp", input });
   }
 
   function handleRetry(): void {
     if (retry === null) return;
-    void submitOrder(retry.input);
+    void submitRequest(retry);
   }
 
   function handleHoldCheck(): void {
     if (hold === null) return;
-    void submitOrder(hold.input);
+    void submitRequest(hold);
   }
 
   const handlePollError = useCallback((message: string) => {
@@ -121,7 +140,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
           </label>
           <input
             autoComplete="off"
-            className="h-11 rounded-xl border border-line-strong bg-white px-4 font-mono text-sm outline-none transition-colors focus:border-sky-deep"
+            className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
             id="api-key"
             onChange={(event) => setApiKey(event.target.value)}
             placeholder="pk_test_…"
@@ -152,9 +171,42 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
   return (
     <div className="grid max-w-4xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
       <section>
-        <h2 className="text-lg font-semibold">New order</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">New route</h2>
+          <div aria-label="Route direction" className="inline-flex rounded-xl border border-line bg-surface p-1" role="group">
+            {(
+              [
+                { value: "onramp", label: "Buy XLM" },
+                { value: "offramp", label: "Sell XLM" },
+              ] as const
+            ).map((option) => (
+              <button
+                aria-pressed={direction === option.value}
+                className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                  direction === option.value
+                    ? option.value === "onramp"
+                      ? "bg-coral text-ink"
+                      : "bg-aqua text-ink"
+                    : "text-ink-2 hover:text-ink"
+                }`}
+                key={option.value}
+                onClick={() => {
+                  setDirection(option.value);
+                  setError(null);
+                }}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="mt-4">
-          <OrderCreateForm busy={creating} onSubmit={handleCreate} />
+          {direction === "onramp" ? (
+            <OrderCreateForm busy={creating} onSubmit={handleOnrampCreate} />
+          ) : (
+            <OfframpCreateForm busy={creating} onSubmit={handleOfframpCreate} />
+          )}
         </div>
         {hold !== null && (
           <div className="mt-4 rounded-[20px] border border-line bg-sky-tint px-5 py-4" role="status">
@@ -192,7 +244,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
               <>
                 {" "}
                 <span className="underline underline-offset-2">request id</span>{" "}
-                <span className="font-mono text-xs">{requestId}</span>; keep it
+                <span className="break-all text-xs">{requestId}</span>; keep it
                 if you contact support.
               </>
             )}
@@ -241,6 +293,11 @@ function explainCreateError(error: ApiError): string {
       return "The amount is outside the supported range. Typical bounds are 10.000 to 10.000.000 idr.";
     case "INVALID_STELLAR_ACCOUNT":
       return "The destination is not a valid Stellar testnet address.";
+    case "INVALID_ASSET_AMOUNT":
+    case "ASSET_AMOUNT_OUT_OF_RANGE":
+      return "The XLM amount is outside the supported range.";
+    case "INVALID_DESTINATION_TOKEN":
+      return "The sandbox payout reference is not valid.";
     case "QUOTE_UNAVAILABLE":
     case "EXTERNAL_SERVICE_UNAVAILABLE":
       return `${error.message} This is usually temporary; retry in a moment.`;

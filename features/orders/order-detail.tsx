@@ -6,6 +6,9 @@ import type { Order } from "@/lib/api/types";
 import { getOrder } from "@/lib/api/orders";
 import { isActiveStatus, statusStyle } from "./status";
 import { PaymentPanel } from "./payment-panel";
+import { OfframpPanel } from "./offramp-panel";
+import { RouteTimeline } from "./route-timeline";
+import { routeStatus } from "./route-status";
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -31,7 +34,7 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
 
   // Poll while the order is in an active state; stop on anything terminal.
   useEffect(() => {
-    if (!isActiveStatus(initialOrder.status)) return;
+    if (!isActiveStatus(order.status)) return;
     const timer = setInterval(async () => {
       try {
         const fresh = await getOrder(initialOrder.id, apiKey);
@@ -44,89 +47,76 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
       }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [initialOrder.id, initialOrder.status, apiKey, onPollError]);
+  }, [initialOrder.id, order.status, apiKey, onPollError]);
 
   const style = statusStyle(order.status);
-  const settled =
-    order.status === "completed" ||
-    order.status === "expired" ||
-    order.status === "payment_failed" ||
-    order.status === "stellar_failed";
+  const route = routeStatus({ direction: order.direction, status: order.status });
+  const isBuy = order.direction === "onramp";
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Step 1 · what this order is */}
-      <section aria-label="Order summary" className="rounded-xl border border-line bg-surface p-5">
+      <section aria-label="Order summary" className="rounded-[28px] border border-line bg-surface p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-mono text-xs text-ink-3">step 1 of 3 · your order</p>
-            <p className="mt-1 text-lg font-semibold tracking-tight">
-              Buy {order.asset.amount} XLM for {formatIdr(order.fiat.amount_minor)} idr
+            <p className="text-xs font-bold tracking-[0.1em] text-ink-3">YOUR ROUTE</p>
+            <p className="mt-2 text-2xl font-bold tracking-[-0.04em]">{isBuy ? "Buy XLM" : "Sell XLM"}</p>
+            <p className="mt-1 text-sm leading-6 text-ink-2">
+              {isBuy
+                ? `${formatIdr(order.fiat.amount_minor)} IDR to ${order.asset.amount} XLM`
+                : `${order.asset.amount} XLM to ${formatIdr(order.fiat.amount_minor)} IDR`}
             </p>
           </div>
-          <span className={`rounded-full px-3 py-1 font-mono text-xs ${style.pill}`}>
-            {order.status}
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${style.pill}`}>
+            {presentStatus(order.status)}
           </span>
         </div>
-        <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 font-mono text-sm tnum sm:grid-cols-4">
+        <RouteTimeline view={route} />
+        <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-5 text-sm tnum sm:grid-cols-4">
           <div>
-            <dt className="text-xs text-ink-3">you pay</dt>
-            <dd>{formatIdr(order.fiat.amount_minor)} idr</dd>
+            <dt className="text-xs font-semibold text-ink-3">{isBuy ? "You pay" : "You receive"}</dt>
+            <dd className="mt-1 font-semibold">{formatIdr(order.fiat.amount_minor)} IDR</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-3">you receive</dt>
-            <dd>{order.asset.amount} xlm</dd>
+            <dt className="text-xs font-semibold text-ink-3">{isBuy ? "You receive" : "You send"}</dt>
+            <dd className="mt-1 font-semibold">{order.asset.amount} XLM</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-3">rate</dt>
-            <dd>{order.quote.adjusted_rate}</dd>
+            <dt className="text-xs font-semibold text-ink-3">Locked rate</dt>
+            <dd className="mt-1 font-semibold">{order.quote.adjusted_rate} IDR</dd>
           </div>
           <div>
-            <dt className="text-xs text-ink-3">spread</dt>
-            <dd>{order.quote.spread_bps} bps</dd>
+            <dt className="text-xs font-semibold text-ink-3">Spread</dt>
+            <dd className="mt-1 font-semibold">{order.quote.spread_bps} bps</dd>
           </div>
         </dl>
-        {settled && (
-          <p className="mt-4 border-t border-line pt-3 text-sm leading-6 text-ink-2">{style.note}</p>
-        )}
+        <p className="mt-5 border-t border-line pt-4 text-sm leading-6 text-ink-2">{route.detail}</p>
       </section>
 
-      {/* Step 2 · pay (only while the checkout is alive) */}
-      {(order.status === "created" || order.status === "payment_pending") && (
-        <section
-          aria-label="Payment"
-          className="rounded-xl border border-line bg-paper-recess p-5"
-        >
-          <p className="font-mono text-xs text-ink-3">step 2 of 3 · payment</p>
-          <div className="mt-4 rounded-lg bg-surface p-5 shadow-card">
+      {isBuy && (order.status === "created" || order.status === "payment_pending") && (
+        <section aria-label="Payment" className="rounded-[28px] border border-line bg-paper-recess p-5 sm:p-6">
+          <p className="text-xs font-bold tracking-[0.1em] text-ink-3">PAY IN RUPIAH</p>
+          <div className="mt-4">
             <PaymentPanelHeaderNote status={order.status} />
-            <div className="mt-4">
-              <PaymentPanel order={order} remainingSeconds={remaining} />
-            </div>
+            <PaymentPanel order={order} remainingSeconds={remaining} />
           </div>
         </section>
       )}
 
-      {/* Step 3 · settlement */}
-      <section aria-label="Settlement" className="rounded-xl border border-line bg-surface p-5">
-        <p className="font-mono text-xs text-ink-3">step 3 of 3 · settlement on stellar testnet</p>
+      {!isBuy && <OfframpPanel order={order} />}
 
-        {order.status === "stellar_processing" && (
-          <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-ink-2" role="status">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orchid-deep opacity-50" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-orchid-deep" />
-            </span>
-            Sending your XLM. This is usually brief.
-          </p>
-        )}
-        {order.status !== "stellar_processing" && (
-          <p className="mt-3 text-sm leading-6 text-ink-2">{style.note}</p>
-        )}
+      <section aria-label="Settlement" className="rounded-[28px] border border-line bg-surface p-5 sm:p-6">
+        <p className="text-xs font-bold tracking-[0.1em] text-ink-3">WHAT HAPPENS NEXT</p>
+        <div className="mt-3 flex items-start gap-3" role="status">
+          {isActiveStatus(order.status) && <span aria-hidden className="mt-2 h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-lilac-deep" />}
+          <div>
+            <h3 className="text-xl font-bold tracking-[-0.03em]">{route.title}</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-2">{route.detail}</p>
+          </div>
+        </div>
 
         {order.status === "completed" && order.stellar_transaction_hash !== undefined && (
           <a
-            className="card-rise mt-4 inline-block break-all rounded-lg border border-gold/40 bg-sun-tint px-4 py-3 text-sm font-medium text-brass-text hover:border-gold"
+            className="card-rise mt-5 inline-flex rounded-xl border border-gold/40 bg-sun-tint px-4 py-3 text-sm font-bold text-brass-text hover:border-gold"
             href={`https://stellar.expert/lumen/testnet/tx/${order.stellar_transaction_hash}`}
             rel="noopener noreferrer"
             target="_blank"
@@ -135,24 +125,30 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
           </a>
         )}
 
+        {order.deposit_transaction_hash !== undefined && (
+          <a
+            className="card-rise mt-5 inline-flex rounded-xl border border-aqua-deep/25 bg-aqua-tint px-4 py-3 text-sm font-bold text-aqua-deep hover:border-aqua-deep"
+            href={`https://stellar.expert/lumen/testnet/tx/${order.deposit_transaction_hash}`}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            View the deposit on the testnet explorer
+          </a>
+        )}
+
         {order.status === "stellar_failed" && (
-          <p className="mt-4 rounded-lg bg-sun-tint px-4 py-3 text-sm leading-6 text-sun-deep" role="alert">
-            Your payment arrived and will not be lost. Keep the order id{" "}
-            <span className="font-mono text-xs">{order.id}</span> for support; do not
-            pay again.
+          <p className="mt-4 rounded-xl bg-sun-tint px-4 py-3 text-sm leading-6 text-sun-deep" role="alert">
+            Your payment arrived and will not be lost. Keep order {order.id} for support. Do not pay again.
           </p>
         )}
       </section>
 
-      <p className="font-mono text-xs leading-5 text-ink-3">
-        order {order.id} · sandbox environment · stellar testnet network · created{" "}
-        {order.created_at}
-      </p>
+      <p className="text-xs leading-5 text-ink-3">Order {order.id} <span aria-hidden className="mx-2 text-line-strong">|</span> Sandbox environment <span aria-hidden className="mx-2 text-line-strong">|</span> Stellar Testnet <span aria-hidden className="mx-2 text-line-strong">|</span> Created {order.created_at}</p>
     </div>
   );
 }
 
-function PaymentPanelHeaderNote({ status }: { status: Order["status"] }): React.ReactElement {
+function PaymentPanelHeaderNote({ status }: { status: Order["status"] }): React.ReactElement | null {
   if (status === "created") {
     return (
       <p className="text-sm leading-6 text-ink-2" role="status">
@@ -160,5 +156,9 @@ function PaymentPanelHeaderNote({ status }: { status: Order["status"] }): React.
       </p>
     );
   }
-  return <></>;
+  return null;
+}
+
+function presentStatus(status: Order["status"]): string {
+  return status.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase());
 }

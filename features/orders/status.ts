@@ -40,6 +40,38 @@ const statusStyles: Record<OrderStatus, StatusStyle> = {
     pill: "bg-sun-tint text-sun-deep",
     note: "Paid, but the transfer failed. Support will resolve it. Do not pay again.",
   },
+  cancelled: {
+    pill: "bg-paper-recess text-ink-3",
+    note: "This order is no longer active.",
+  },
+  asset_pending: {
+    pill: "bg-aqua-tint text-aqua-deep",
+    note: "Send the exact XLM amount to the sandbox deposit address before expiry.",
+  },
+  asset_received: {
+    pill: "bg-aqua-tint text-aqua-deep",
+    note: "The sandbox received your XLM and is preparing the payout.",
+  },
+  asset_invalid: {
+    pill: "bg-sun-tint text-sun-deep",
+    note: "The received asset did not match the quoted deposit instructions.",
+  },
+  retirement_processing: {
+    pill: "bg-orchid-tint text-orchid-deep",
+    note: "The received XLM is being retired on Stellar testnet.",
+  },
+  withdrawal_processing: {
+    pill: "bg-orchid-tint text-orchid-deep",
+    note: "The sandbox is preparing the simulated IDR payout.",
+  },
+  retirement_failed: {
+    pill: "bg-sun-tint text-sun-deep",
+    note: "The sandbox could not retire the received XLM. Keep the order for support.",
+  },
+  withdrawal_failed: {
+    pill: "bg-sun-tint text-sun-deep",
+    note: "The payout simulation failed. Keep the order for support.",
+  },
 };
 
 export function statusStyle(status: OrderStatus): StatusStyle {
@@ -51,6 +83,10 @@ export const ACTIVE_STATUSES: readonly OrderStatus[] = [
   "payment_pending",
   "payment_confirmed",
   "stellar_processing",
+  "asset_pending",
+  "asset_received",
+  "retirement_processing",
+  "withdrawal_processing",
 ];
 
 export function isActiveStatus(status: OrderStatus): boolean {

@@ -4,13 +4,11 @@
  * so no floating-point ever touches a value.
  */
 
-const groupFormatter = new Intl.NumberFormat("id-ID");
-
 /** "1250000" -> "1.250.000" (display only). */
 export function formatIdr(amountMinor: string): string {
   const digits = amountMinor.replace(/\D/g, "");
   if (digits.length === 0) return "0";
-  return groupFormatter.format(Number(digits));
+  return groupDigits(digits);
 }
 
 /** Raw typed input -> minor-unit string, or null when there are no digits. */
@@ -23,5 +21,9 @@ export function parseIdrInput(input: string): string | null {
 /** Typed input -> grouped display ("1250000" -> "1.250.000"), separators as you type. */
 export function formatIdrInput(input: string): string {
   const minor = parseIdrInput(input);
-  return minor === null ? "" : groupFormatter.format(Number(minor));
+  return minor === null ? "" : groupDigits(minor);
+}
+
+function groupDigits(digits: string): string {
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }

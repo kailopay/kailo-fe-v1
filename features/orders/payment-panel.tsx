@@ -32,7 +32,7 @@ export function PaymentPanel({
     <section aria-label="Payment instructions" className="flex flex-col gap-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs text-ink-3">step 2 of 3 · complete your payment</p>
+          <p className="text-xs font-semibold text-ink-3">Step 2 of 3: complete your payment</p>
           <p className="mt-1 text-2xl font-semibold tnum tracking-tight">
             {formatIdr(order.fiat.amount_minor)}{" "}
             <span className="text-base font-medium text-ink-2">idr</span>
@@ -101,8 +101,8 @@ function QrisStage({ presentationValue }: { presentationValue: string }): React.
           <div aria-hidden className="h-[232px] w-[232px] animate-pulse rounded-lg bg-surface-2" />
         )}
         <figcaption className="text-center">
-          <span className="rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-ink-3">
-            qris · one code, any indonesian e-wallet
+          <span className="rounded border border-line px-1.5 py-0.5 text-[10px] text-ink-3">
+            QRIS, one code for any Indonesian e-wallet
           </span>
         </figcaption>
       </figure>
@@ -146,7 +146,7 @@ function VaStage({ presentationValue }: { presentationValue: string }): React.Re
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
       <div className="rounded-xl border border-line bg-surface p-5">
         <p className="text-xs font-medium text-ink-3">BRI virtual account number</p>
-        <p className="mt-1 break-all font-mono text-2xl font-semibold tnum tracking-wide">
+        <p className="mt-1 break-all text-2xl font-semibold tnum tracking-wide">
           {presentationValue}
         </p>
         <VaCopy value={presentationValue} />

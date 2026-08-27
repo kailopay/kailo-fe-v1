@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --no-warnings --experimental-strip-types --test --test-isolation=none --test-concurrency=1"
+    "test": "node --no-warnings --experimental-transform-types --test --test-isolation=none --test-concurrency=1"
   },
   "dependencies": {
     "next": "16.3.2",

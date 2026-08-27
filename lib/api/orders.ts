@@ -1,6 +1,6 @@
-import { apiRequest, isRecord, numberField, stringField } from "./client";
-import { ApiError } from "./client";
-import type { Checkout, Order, OrderStatus, PaymentMethod, Quote } from "./types";
+import { apiRequest, isRecord, numberField, stringField } from "./client.ts";
+import { ApiError } from "./client.ts";
+import type { Checkout, Order, OrderDirection, OrderStatus, PaymentMethod, Payout, Quote } from "./types.ts";
 
 const ORDER_STATUSES = [
   "created",
@@ -11,7 +11,25 @@ const ORDER_STATUSES = [
   "expired",
   "payment_failed",
   "stellar_failed",
+  "cancelled",
+  "asset_pending",
+  "asset_received",
+  "asset_invalid",
+  "retirement_processing",
+  "withdrawal_processing",
+  "retirement_failed",
+  "withdrawal_failed",
 ] as const satisfies readonly OrderStatus[];
+
+const OFFRAMP_STATUSES: readonly OrderStatus[] = [
+  "asset_pending",
+  "asset_received",
+  "asset_invalid",
+  "retirement_processing",
+  "withdrawal_processing",
+  "retirement_failed",
+  "withdrawal_failed",
+];
 
 function isOrderStatus(value: string): value is OrderStatus {
   return (ORDER_STATUSES as readonly string[]).includes(value);
@@ -44,6 +62,31 @@ function parseCheckout(value: unknown): Checkout | null {
   };
 }
 
+function parsePayout(value: unknown): Payout | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value)) throw malformed("payout");
+  const method = stringField(value, "method");
+  const simulated = value.simulated;
+  if (method !== "sandbox_bank_transfer" || typeof simulated !== "boolean") {
+    throw malformed("payout fields");
+  }
+  return {
+    reference: stringField(value, "reference"),
+    method,
+    amount_minor: stringField(value, "amount_minor"),
+    state: stringField(value, "state"),
+    simulated,
+    disclosure: stringField(value, "disclosure"),
+  };
+}
+
+function inferDirection(status: OrderStatus, payout: Payout | undefined, depositHash: string | undefined): OrderDirection {
+  if (OFFRAMP_STATUSES.includes(status) || payout !== undefined || depositHash !== undefined) {
+    return "offramp";
+  }
+  return "onramp";
+}
+
 function parseOrderBody(order: Record<string, unknown>): Order {
   const status = stringField(order, "status");
   if (!isOrderStatus(status)) throw malformed(`order status "${status}"`);
@@ -58,13 +101,17 @@ function parseOrderBody(order: Record<string, unknown>): Order {
   const memo: unknown = destination.memo;
   if (memo !== null && typeof memo !== "string") throw malformed("destination memo");
 
-  const paymentMethod = stringField(order, "payment_method");
-  if (paymentMethod !== "qris" && paymentMethod !== "bri_va") {
+  const rawPaymentMethod = order.payment_method;
+  if (rawPaymentMethod !== null && rawPaymentMethod !== "qris" && rawPaymentMethod !== "bri_va") {
     throw malformed("payment_method");
   }
 
+  const depositHash = optionalStringField(order, "deposit_transaction_hash");
+  const payout = parsePayout(order.payout);
+
   const parsed: Order = {
     id: stringField(order, "id"),
+    direction: inferDirection(status, payout, depositHash),
     status,
     environment: stringField(order, "environment") as Order["environment"],
     network: stringField(order, "network") as Order["network"],
@@ -77,7 +124,7 @@ function parseOrderBody(order: Record<string, unknown>): Order {
       amount: stringField(asset, "amount"),
     },
     quote: parseQuote(order.quote),
-    payment_method: paymentMethod,
+    payment_method: rawPaymentMethod,
     stellar_destination: {
       account: stringField(destination, "account"),
       memo,
@@ -89,8 +136,10 @@ function parseOrderBody(order: Record<string, unknown>): Order {
 
   const hash: unknown = order.stellar_transaction_hash;
   if (typeof hash === "string") parsed.stellar_transaction_hash = hash;
-  const failureCode: unknown = order.failure_code;
-  if (typeof failureCode === "string") parsed.failure_code = failureCode;
+  if (depositHash !== undefined) parsed.deposit_transaction_hash = depositHash;
+  if (payout !== undefined) parsed.payout = payout;
+  const failureCode = optionalStringField(order, "failure_code");
+  if (failureCode !== undefined) parsed.failure_code = failureCode;
 
   return parsed;
 }
@@ -104,6 +153,13 @@ function malformed(what: string): ApiError {
   return new ApiError(`Malformed payload: ${what}`, 0, "MALFORMED_RESPONSE", null);
 }
 
+function optionalStringField(record: Record<string, unknown>, key: string): string | undefined {
+  const value: unknown = record[key];
+  if (value === undefined) return undefined;
+  if (typeof value !== "string") throw malformed(`field "${key}"`);
+  return value;
+}
+
 export type CreateOrderInput = {
   apiKey: string;
   idempotencyKey: string;
@@ -111,6 +167,13 @@ export type CreateOrderInput = {
   paymentMethod: PaymentMethod;
   destinationAccount: string;
   memo: string | null;
+};
+
+export type CreateOfframpInput = {
+  apiKey: string;
+  idempotencyKey: string;
+  assetAmount: string;
+  destinationToken: string;
 };
 
 /** POST /v1/onramps. 201 (new) and 200 (idempotent replay) are both success. */
@@ -140,6 +203,24 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
       null,
     );
   }
+  return parseOrderEnvelope(payload);
+}
+
+/** POST /v1/offramps. 201 (new) and 200 (idempotent replay) are both success. */
+export async function createOfframp(input: CreateOfframpInput): Promise<Order> {
+  const payload: unknown = await apiRequest("/v1/offramps", {
+    method: "POST",
+    apiKey: input.apiKey,
+    idempotencyKey: input.idempotencyKey,
+    body: {
+      asset: { network: "stellar_testnet", code: "XLM", amount: input.assetAmount },
+      withdrawal: {
+        currency: "IDR",
+        method: "sandbox_bank_transfer",
+        destination_token: input.destinationToken,
+      },
+    },
+  });
   return parseOrderEnvelope(payload);
 }
 

@@ -58,7 +58,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
           Amount (idr)
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 font-mono text-sm tnum outline-none transition-colors focus:border-sky-deep"
+          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm tnum outline-none transition-colors focus:border-sky-deep"
           id="amount"
           inputMode="numeric"
           onChange={(event) => setAmountDisplay(formatIdrInput(event.target.value))}
@@ -101,7 +101,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
           Stellar testnet destination
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 font-mono text-sm outline-none transition-colors focus:border-sky-deep"
+          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
           id="destination"
           onChange={(event) => setDestination(event.target.value)}
           placeholder="G… 56 characters"
@@ -118,7 +118,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
           Memo (optional)
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 font-mono text-sm outline-none transition-colors focus:border-sky-deep"
+          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
           id="memo"
           maxLength={28}
           onChange={(event) => setMemo(event.target.value)}

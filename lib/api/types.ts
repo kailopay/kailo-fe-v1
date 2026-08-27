@@ -27,7 +27,17 @@ export type OrderStatus =
   | "completed"
   | "expired"
   | "payment_failed"
-  | "stellar_failed";
+  | "stellar_failed"
+  | "cancelled"
+  | "asset_pending"
+  | "asset_received"
+  | "asset_invalid"
+  | "retirement_processing"
+  | "withdrawal_processing"
+  | "retirement_failed"
+  | "withdrawal_failed";
+
+export type OrderDirection = "onramp" | "offramp";
 
 export type Quote = {
   rate: string;
@@ -49,18 +59,30 @@ export type Checkout = {
   expires_at: string;
 };
 
+export type Payout = {
+  reference: string;
+  method: "sandbox_bank_transfer";
+  amount_minor: string;
+  state: string;
+  simulated: boolean;
+  disclosure: string;
+};
+
 export type Order = {
   id: string;
+  direction: OrderDirection;
   status: OrderStatus;
   environment: "sandbox";
   network: "stellar_testnet";
   fiat: { currency: "IDR"; amount_minor: string };
   asset: { code: "XLM"; amount: string };
   quote: Quote;
-  payment_method: PaymentMethod;
+  payment_method: PaymentMethod | null;
   stellar_destination: { account: string; memo: string | null };
   checkout: Checkout | null;
   stellar_transaction_hash?: string;
+  deposit_transaction_hash?: string;
+  payout?: Payout;
   failure_code?: string;
   created_at: string;
   updated_at: string;
