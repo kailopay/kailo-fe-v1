@@ -135,15 +135,15 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
     return (
       <div className="max-w-xl">
         <form className="flex flex-col gap-4" onSubmit={acceptKey}>
-          <label className="text-sm font-medium text-ink-2" htmlFor="api-key">
+          <label className="kp-field-label" htmlFor="api-key">
             Your test API key
           </label>
           <input
             autoComplete="off"
-            className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
+            className="kp-input"
             id="api-key"
             onChange={(event) => setApiKey(event.target.value)}
-            placeholder="pk_test_…"
+            placeholder="pk_test_"
             type="password"
             value={apiKey}
           />
@@ -153,12 +153,12 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
             out, and is never logged.
           </p>
           {error !== null && (
-            <p className="rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
+            <p className="kp-notice" data-tone="warning" role="alert">
               {error}
             </p>
           )}
           <button
-            className="h-12 rounded-xl bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-deep"
+            className="kp-primary-button w-full"
             type="submit"
           >
             Use this key
@@ -169,11 +169,11 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
   }
 
   return (
-    <div className="grid max-w-4xl gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-start">
+    <div className="kp-dev-playground-grid max-w-4xl">
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">New route</h2>
-          <div aria-label="Route direction" className="inline-flex rounded-xl border border-line bg-surface p-1" role="group">
+          <h2 className="kp-dev-section-title">New route</h2>
+          <div aria-label="Route direction" className="kp-dev-tabs" role="group">
             {(
               [
                 { value: "onramp", label: "Buy XLM" },
@@ -182,13 +182,9 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
             ).map((option) => (
               <button
                 aria-pressed={direction === option.value}
-                className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                  direction === option.value
-                    ? option.value === "onramp"
-                      ? "bg-coral text-ink"
-                      : "bg-aqua text-ink"
-                    : "text-ink-2 hover:text-ink"
-                }`}
+                className="kp-dev-tab"
+                data-active={direction === option.value}
+                data-tone={option.value === "onramp" ? "buy" : "sell"}
                 key={option.value}
                 onClick={() => {
                   setDirection(option.value);
@@ -209,16 +205,16 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
           )}
         </div>
         {hold !== null && (
-          <div className="mt-4 rounded-[20px] border border-line bg-sky-tint px-5 py-4" role="status">
-            <p className="text-sm font-medium text-sky-deep">
+          <div className="kp-notice mt-4" data-tone="success" role="status">
+            <p className="text-sm font-bold text-ink">
               {hold.direction === "onramp" ? "Processing the checkout with the payment provider." : "Processing the sell route."}
             </p>
-            <p className="mt-1 text-sm leading-6 text-sky-deep/80">
+            <p className="mt-1 text-sm leading-6 text-ink-2">
               Your order exists and its outcome is being reconciled. Do not
               create it again. Check back with the same request.
             </p>
             <button
-              className="mt-3 h-11 rounded-xl border border-sky-deep/40 px-4 text-sm font-medium text-sky-deep transition-colors hover:border-sky-deep disabled:opacity-50"
+              className="kp-secondary-button mt-3"
               disabled={creating}
               onClick={handleHoldCheck}
               type="button"
@@ -229,7 +225,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         )}
         {retry !== null && (
           <button
-            className="mt-4 h-12 w-full rounded-xl bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-deep disabled:opacity-50"
+            className="kp-primary-button mt-4 w-full"
             disabled={creating}
             onClick={handleRetry}
             type="button"
@@ -238,7 +234,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
           </button>
         )}
         {error !== null && (
-          <p className="mt-4 rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
+          <p className="kp-notice mt-4" data-tone="warning" role="alert">
             {error}
             {requestId !== null && (
               <>
@@ -253,10 +249,10 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold">Order</h2>
+        <h2 className="kp-dev-section-title">Order</h2>
         <div className="mt-4">
           {order === null ? (
-            <p className="rounded-[20px] border border-line bg-white px-5 py-6 text-sm leading-6 text-ink-3">
+            <p className="kp-dev-empty">
               No order yet in this session. Create one and its checkout,
               quote, and status timeline appear here.
             </p>

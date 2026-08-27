@@ -55,10 +55,10 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
 
   return (
     <div className="flex flex-col gap-6">
-      <section aria-label="Order summary" className="rounded-[28px] border border-line bg-surface p-5 sm:p-6">
+      <section aria-label="Order summary" className="kp-order-block">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-bold tracking-[0.1em] text-ink-3">YOUR ROUTE</p>
+            <p className="text-sm font-bold text-coral-deep">Your route</p>
             <p className="mt-2 text-2xl font-bold tracking-[-0.04em]">{isBuy ? "Buy XLM" : "Sell XLM"}</p>
             <p className="mt-1 text-sm leading-6 text-ink-2">
               {isBuy
@@ -93,8 +93,8 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
       </section>
 
       {isBuy && (order.status === "created" || order.status === "payment_pending") && (
-        <section aria-label="Payment" className="rounded-[28px] border border-line bg-paper-recess p-5 sm:p-6">
-          <p className="text-xs font-bold tracking-[0.1em] text-ink-3">PAY IN RUPIAH</p>
+        <section aria-label="Payment" className="kp-order-block">
+          <p className="text-sm font-bold text-coral-deep">Pay in rupiah</p>
           <div className="mt-4">
             <PaymentPanelHeaderNote status={order.status} />
             <PaymentPanel order={order} remainingSeconds={remaining} />
@@ -104,8 +104,8 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
 
       {!isBuy && <OfframpPanel order={order} />}
 
-      <section aria-label="Settlement" className="rounded-[28px] border border-line bg-surface p-5 sm:p-6">
-        <p className="text-xs font-bold tracking-[0.1em] text-ink-3">WHAT HAPPENS NEXT</p>
+      <section aria-label="Settlement" className="kp-order-block">
+        <p className="text-sm font-bold text-ink-2">What happens next</p>
         <div className="mt-3 flex items-start gap-3" role="status">
           {isActiveStatus(order.status) && <span aria-hidden className="mt-2 h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-lilac-deep" />}
           <div>
@@ -116,7 +116,7 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
 
         {order.status === "completed" && order.stellar_transaction_hash !== undefined && (
           <a
-            className="card-rise mt-5 inline-flex rounded-xl border border-gold/40 bg-sun-tint px-4 py-3 text-sm font-bold text-brass-text hover:border-gold"
+            className="kp-secondary-button mt-5"
             href={`https://stellar.expert/lumen/testnet/tx/${order.stellar_transaction_hash}`}
             rel="noopener noreferrer"
             target="_blank"
@@ -127,7 +127,7 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
 
         {order.deposit_transaction_hash !== undefined && (
           <a
-            className="card-rise mt-5 inline-flex rounded-xl border border-aqua-deep/25 bg-aqua-tint px-4 py-3 text-sm font-bold text-aqua-deep hover:border-aqua-deep"
+            className="kp-secondary-button mt-5"
             href={`https://stellar.expert/lumen/testnet/tx/${order.deposit_transaction_hash}`}
             rel="noopener noreferrer"
             target="_blank"
@@ -137,7 +137,7 @@ export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderD
         )}
 
         {order.status === "stellar_failed" && (
-          <p className="mt-4 rounded-xl bg-sun-tint px-4 py-3 text-sm leading-6 text-sun-deep" role="alert">
+          <p className="kp-notice mt-4" data-tone="warning" role="alert">
             Your payment arrived and will not be lost. Keep order {order.id} for support. Do not pay again.
           </p>
         )}

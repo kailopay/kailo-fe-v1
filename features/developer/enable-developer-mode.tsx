@@ -32,7 +32,7 @@ export function EnableDeveloperMode() {
   return (
     <div className="mt-4 flex flex-col items-start gap-3">
       <button
-        className="h-11 rounded-xl bg-ink px-6 text-sm font-medium text-paper transition-colors hover:bg-ink-deep disabled:opacity-50"
+        className="kp-primary-button"
         disabled={busy}
         onClick={() => void handleEnable()}
         type="button"

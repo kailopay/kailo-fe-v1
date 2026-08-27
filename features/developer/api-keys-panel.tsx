@@ -8,7 +8,7 @@ import { formatDate } from "./format-date";
 
 type ApiKeysPanelProps = { initialKeys: ApiKeyMeta[] };
 
-export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
+export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps): React.ReactElement {
   const router = useRouter();
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
@@ -51,7 +51,6 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
   }
 
   function dismissReveal(): void {
-    // The plaintext key leaves memory here; only the hash exists server-side.
     setCreated(null);
     setCopied(false);
     router.refresh();
@@ -65,7 +64,7 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
     setCreating(true);
     setError(null);
     try {
-      await apiRequest(`/v1/api-keys/${id}`, { method: "DELETE" });
+      await apiRequest("/v1/api-keys/" + id, { method: "DELETE" });
       setRevokingId(null);
       router.refresh();
     } catch (caught) {
@@ -82,110 +81,86 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
   }
 
   return (
-    <div className="mt-6 flex flex-col gap-6">
+    <div className="mt-8">
       {created !== null && (
-        <div className="rounded-[20px] border border-gold/40 bg-sun-tint p-5" role="alertdialog" aria-label="API key created">
-          <p className="text-sm font-semibold text-sun-deep">Copy your key now</p>
-          <p className="mt-1 text-sm leading-6 text-sun-deep/80">
-            This is the only time the full key is shown. The server keeps
-            only a hash and cannot recover it.
+        <div className="kp-key-reveal" role="alertdialog" aria-label="API key created">
+          <p className="text-sm font-bold text-ink">Copy your key now</p>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-ink-2">
+            This is the only time the full key is shown. The server keeps only a hash and cannot recover it.
           </p>
-          <p className="mt-3 break-all rounded-xl bg-white px-4 py-3 text-sm text-ink">
-            {created.key}
-          </p>
-          <div className="mt-4 flex gap-2">
-            <button
-              className="rounded-lg bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink-deep"
-              onClick={() => void handleCopy()}
-              type="button"
-            >
+          <p className="kp-key-value mt-4">{created.key}</p>
+          <div className="mt-4 flex flex-wrap gap-4">
+            <button className="kp-primary-button" onClick={() => void handleCopy()} type="button">
               {copied ? "Copied" : "Copy key"}
             </button>
-            <button
-              className="rounded-lg border border-line-strong px-4 py-2 text-sm font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink"
-              onClick={dismissReveal}
-              type="button"
-            >
-              I saved it, close
+            <button className="kp-secondary-button" onClick={dismissReveal} type="button">
+              I saved it
             </button>
           </div>
         </div>
       )}
 
-      <form className="flex gap-3" onSubmit={(event) => void handleCreate(event)}>
+      <form className="kp-dev-create-row" onSubmit={(event) => void handleCreate(event)}>
+        <div>
+          <label className="kp-field-label" htmlFor="api-key-name">Create a test key</label>
+          <p className="mt-1 text-xs leading-5 text-ink-3">Give it a name you will recognize in the playground.</p>
+        </div>
         <input
-          className="h-11 flex-1 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
+          className="kp-input"
+          id="api-key-name"
           maxLength={100}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Key name, for example: playground"
+          placeholder="Playground key"
           value={name}
         />
-        <button
-          className="h-11 rounded-xl bg-ink px-5 text-sm font-medium text-paper transition-colors hover:bg-ink-deep disabled:opacity-50"
-          disabled={creating || name.trim().length === 0}
-          type="submit"
-        >
-          {creating ? "Working" : "Create key"}
+        <button className="kp-primary-button" disabled={creating || name.trim().length === 0} type="submit">
+          {creating ? "Creating" : "Create key"}
         </button>
       </form>
 
       {error !== null && (
-        <p className="rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
-          {error}
-        </p>
+        <p className="kp-notice mt-6" data-tone="warning" role="alert">{error}</p>
       )}
 
       {initialKeys.length === 0 ? (
-        <p className="rounded-[20px] border border-line bg-white px-5 py-6 text-sm leading-6 text-ink-3">
-          No API keys yet. Create one to use the playground and the order
-          API.
-        </p>
+        <p className="kp-dev-empty mt-8">No API keys yet. Create one to use the playground and order API.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
-          {initialKeys.map((apiKey) => {
-            const revoked = apiKey.revoked_at !== null;
-            return (
-              <li
-                className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] border border-line bg-white px-5 py-4"
-                key={apiKey.id}
-              >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className={`truncate text-sm font-medium ${revoked ? "text-ink-3 line-through" : ""}`}>
-                      {apiKey.name}
+        <section className="mt-10" aria-labelledby="existing-keys-title">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-lg font-bold tracking-[-0.025em] text-ink" id="existing-keys-title">Existing keys</h2>
+            <p className="text-xs text-ink-3">The secret is never shown again</p>
+          </div>
+          <ul className="kp-dev-key-list mt-3">
+            {initialKeys.map((apiKey) => {
+              const revoked = apiKey.revoked_at !== null;
+              return (
+                <li className="kp-dev-row" key={apiKey.id}>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className={revoked ? "text-sm font-bold text-ink-3 line-through" : "text-sm font-bold text-ink"}>{apiKey.name}</p>
+                      {revoked && <span className="kp-status-tag" data-tone="warning">revoked</span>}
+                    </div>
+                    <p className="kp-dev-mono-value mt-2">{apiKey.prefix}</p>
+                    <p className="mt-1 text-xs text-ink-3">
+                      Created {formatDate(apiKey.created_at)}
+                      {apiKey.last_used_at !== undefined && ", last used " + formatDate(apiKey.last_used_at)}
                     </p>
-                    {revoked && (
-                      <span className="rounded-full bg-sun-tint px-2 py-0.5 text-xs font-medium text-sun-deep">
-                        revoked
-                      </span>
-                    )}
                   </div>
-                  <p className="mt-1 truncate text-xs text-ink-3">
-                    {apiKey.prefix}
-                  </p>
-                  <p className="mt-1 text-xs text-ink-3">
-                    created {formatDate(apiKey.created_at)}
-                    {apiKey.last_used_at !== undefined && `, last used ${formatDate(apiKey.last_used_at)}`}
-                  </p>
-                </div>
-                {!revoked && (
-                  <button
-                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
-                      revokingId === apiKey.id
-                        ? "bg-sun text-white"
-                        : "border border-line-strong text-ink-2 hover:border-sun-deep hover:text-sun-deep"
-                    }`}
-                    disabled={creating}
-                    onClick={() => void handleRevoke(apiKey.id)}
-                    type="button"
-                  >
-                    {revokingId === apiKey.id ? "Confirm revoke" : "Revoke"}
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  {!revoked && (
+                    <button
+                      className="kp-secondary-button"
+                      disabled={creating}
+                      onClick={() => void handleRevoke(apiKey.id)}
+                      type="button"
+                    >
+                      {revokingId === apiKey.id ? "Confirm revoke" : "Revoke"}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       )}
     </div>
   );

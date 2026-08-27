@@ -6,8 +6,8 @@ type ButtonProps = {
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: "bg-ink text-paper hover:bg-ink-deep",
-  secondary: "border border-line-strong bg-surface text-ink-2 hover:border-ink hover:text-ink",
+  primary: "kp-primary-button",
+  secondary: "kp-secondary-button",
 };
 
 /** One button shape for the order flow surfaces. */
@@ -19,7 +19,7 @@ export function Button({
 }: ButtonProps): React.ReactElement {
   return (
     <button
-      className={`card-rise inline-flex h-9 items-center justify-center gap-2 rounded-lg px-3.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-55 ${VARIANT_CLASSES[variant]} ${className}`}
+      className={`disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${className}`}
       type={type}
       {...rest}
     />

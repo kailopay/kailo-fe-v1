@@ -18,11 +18,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         {/*
-          Consumer thesis: KailoPay is a soft exchange pocket for one clear
-          corridor. The first screen makes the direction, amount, destination,
-          and rate timing easy to read before the developer handoff.
-          Developer routes keep their own denser workspace so sandbox tools
-          stay useful without turning the consumer app into a console.
+          Visual contract: the exchange is the product, not a dashboard. The
+          consumer surface uses warm paper, ink, coral, and teal with quiet
+          route-first hierarchy. Developer routes keep a denser workbench for
+          sandbox tools, API keys, and order recovery.
         */}
         {children}
       </body>

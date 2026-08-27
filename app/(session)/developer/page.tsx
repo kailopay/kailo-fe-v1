@@ -4,35 +4,34 @@ import { redirect } from "next/navigation";
 import { ApiKeysPanel } from "@/features/developer/api-keys-panel";
 import { EnableDeveloperMode } from "@/features/developer/enable-developer-mode";
 import { parseApiKeys } from "@/lib/api/client";
-import { serverApiRequest, getServerSession } from "@/lib/api/server";
+import { getServerSession, serverApiRequest } from "@/lib/api/server";
 import type { ApiKeyMeta } from "@/lib/api/types";
 
 export const metadata: Metadata = {
   title: "Developer",
 };
 
-export default async function DeveloperPage() {
+export default async function DeveloperPage(): Promise<React.ReactElement> {
   const user = await getServerSession();
   if (user === null) redirect("/login");
 
   if (!user.developer_enabled) {
     return (
-      <div className="max-w-xl">
-        <h1 className="text-2xl font-semibold tracking-tight">Developer</h1>
-        <div className="mt-6 rounded-[20px] border border-line bg-white p-6">
-          <p className="text-sm leading-7 text-ink-2">
-            Developer Mode is off. API key management needs it, and the
-            playground does too. Revoking keys does not disable it.
+      <div className="kp-dev-page max-w-xl">
+        <p className="text-sm font-bold text-coral-deep">Developer workspace</p>
+        <h1 className="kp-dev-heading mt-3">Developer mode</h1>
+        <p className="kp-copy mt-4">Open the technical workspace when you need to create test keys or run the Week 2 order API.</p>
+        <section className="kp-dev-panel mt-10" aria-labelledby="developer-mode-title">
+          <h2 className="text-lg font-bold tracking-[-0.025em] text-ink" id="developer-mode-title">Turn on developer mode</h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-ink-2">
+            It adds API key management and the sandbox playground to your account. It does not change the consumer exchange.
           </p>
           <EnableDeveloperMode />
-          <p className="mt-4 text-xs text-ink-3">
-            You can also toggle it any time on your{" "}
-            <Link className="underline underline-offset-2" href="/profile">
-              profile
-            </Link>
-            .
+          <p className="mt-5 text-xs leading-5 text-ink-3">
+            You can also change this setting from your{" "}
+            <Link className="kp-action-link" href="/profile">profile</Link>.
           </p>
-        </div>
+        </section>
       </div>
     );
   }
@@ -46,24 +45,24 @@ export default async function DeveloperPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">API keys</h1>
-        <div className="flex items-center gap-3">
-          <Link className="text-sm font-semibold text-lilac-deep hover:text-ink" href="/developer/playground">
-            Open Playground
-          </Link>
-          <p className="text-xs text-ink-3">pk_test keys, sandbox only</p>
+    <div className="kp-dev-page">
+      <header className="flex flex-wrap items-end justify-between gap-5">
+        <div>
+          <p className="text-sm font-bold text-coral-deep">Developer workspace</p>
+          <h1 className="kp-dev-heading mt-3">API keys</h1>
+          <p className="kp-copy mt-4 max-w-2xl">Create a test key for the playground. The full secret appears once and stays in your browser only when you use it.</p>
         </div>
+        <Link className="kp-action-link" href="/developer/playground">Open Playground</Link>
+      </header>
+
+      <div className="mt-10 flex flex-wrap items-center gap-4 border-y border-line py-4 text-xs font-bold text-ink-3">
+        <span>Key scope: sandbox order API</span>
+        <span aria-hidden className="h-4 w-px bg-line-strong" />
+        <span>Prefix: pk_test_</span>
       </div>
-      <p className="mt-3 max-w-[70ch] text-sm leading-6 text-ink-2">
-        Keys authenticate the order API. The full key appears exactly once
-        at creation. Revoking a key does not disable Developer Mode.
-      </p>
+
       {loadError !== null ? (
-        <p className="mt-6 rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
-          {loadError}
-        </p>
+        <p className="kp-notice mt-8" data-tone="warning" role="alert">{loadError}</p>
       ) : (
         <ApiKeysPanel initialKeys={keys} />
       )}

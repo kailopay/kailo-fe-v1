@@ -38,7 +38,7 @@ export function PaymentPanel({
             <span className="text-base font-medium text-ink-2">idr</span>
           </p>
         </div>
-        <p className={`rounded-lg px-2.5 py-1 text-sm font-semibold tnum ${urgent ? "bg-st-red-bg text-st-red" : "bg-surface-2 text-ink"}`}>
+        <p className={`kp-status-tag tnum ${urgent ? "text-mango-deep" : "text-ink-2"}`}>
           Expires in {minutes}:{seconds}
         </p>
       </header>
@@ -93,7 +93,7 @@ function QrisStage({ presentationValue }: { presentationValue: string }): React.
 
   return (
     <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-start">
-      <figure className="m-0 flex flex-col items-center gap-2 rounded-xl border border-line bg-surface p-4">
+      <figure className="kp-order-value m-0 flex flex-col items-center gap-2">
         {qrDataUrl !== null ? (
           // eslint-disable-next-line @next/next/no-img-element -- data URL: next/image cannot optimize a generated blob
           <img alt="QRIS payment code" className="h-[232px] w-[232px]" src={qrDataUrl} />
@@ -101,7 +101,7 @@ function QrisStage({ presentationValue }: { presentationValue: string }): React.
           <div aria-hidden className="h-[232px] w-[232px] animate-pulse rounded-lg bg-surface-2" />
         )}
         <figcaption className="text-center">
-          <span className="rounded border border-line px-1.5 py-0.5 text-[10px] text-ink-3">
+          <span className="text-xs text-ink-3">
             QRIS, one code for any Indonesian e-wallet
           </span>
         </figcaption>
@@ -120,7 +120,7 @@ function QrisStage({ presentationValue }: { presentationValue: string }): React.
             <>Confirm the payment in the app.</>,
           ].map((step, index) => (
             <li className="flex gap-3 text-sm leading-6 text-ink-2" key={index}>
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-tint text-xs font-semibold text-accent-text">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-coral-tint text-xs font-semibold text-coral-deep">
                 {index + 1}
               </span>
               <span>{step}</span>
@@ -144,7 +144,7 @@ function VaStage({ presentationValue }: { presentationValue: string }): React.Re
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-start">
-      <div className="rounded-xl border border-line bg-surface p-5">
+      <div className="kp-order-value">
         <p className="text-xs font-medium text-ink-3">BRI virtual account number</p>
         <p className="mt-1 break-all text-2xl font-semibold tnum tracking-wide">
           {presentationValue}
@@ -168,7 +168,7 @@ function VaStage({ presentationValue }: { presentationValue: string }): React.Re
 
       <div className="min-w-0">
         <h3 className="text-sm font-semibold">How to pay</h3>
-        <div className="mt-3 inline-flex rounded-lg border border-line bg-surface p-1">
+        <div className="mt-3 flex gap-4 border-b border-line">
           {(
             [
               { id: "mobile", label: "Mobile banking" },
@@ -177,9 +177,8 @@ function VaStage({ presentationValue }: { presentationValue: string }): React.Re
           ).map((tab) => (
             <button
               aria-pressed={channel === tab.id}
-              className={`card-rise h-8 rounded-md px-3 text-xs font-medium ${
-                channel === tab.id ? "bg-accent-tint text-accent-text" : "text-ink-2 hover:text-ink"
-              }`}
+              className="kp-dev-tab"
+              data-active={channel === tab.id}
               key={tab.id}
               onClick={() => setChannel(tab.id)}
               type="button"
@@ -208,7 +207,7 @@ function VaStage({ presentationValue }: { presentationValue: string }): React.Re
               ]
           ).map((step, index) => (
             <li className="flex gap-3 text-sm leading-6 text-ink-2" key={index}>
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent-tint text-xs font-semibold text-accent-text">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-coral-tint text-xs font-semibold text-coral-deep">
                 {index + 1}
               </span>
               <span>{step}</span>

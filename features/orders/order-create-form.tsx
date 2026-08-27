@@ -54,11 +54,11 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-2" htmlFor="amount">
-          Amount (idr)
+        <label className="kp-field-label" htmlFor="amount">
+          Amount in rupiah
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm tnum outline-none transition-colors focus:border-sky-deep"
+          className="kp-input tnum"
           id="amount"
           inputMode="numeric"
           onChange={(event) => setAmountDisplay(formatIdrInput(event.target.value))}
@@ -71,7 +71,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-ink-2">Payment method</legend>
+        <legend className="kp-field-label">Payment method</legend>
         <div className="flex gap-2">
           {(
             [
@@ -81,11 +81,12 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
           ).map((option) => (
             <button
               aria-pressed={paymentMethod === option.value}
-              className={`h-11 flex-1 rounded-xl border px-4 text-sm font-medium transition-colors ${
+              className={`kp-choice flex-1 ${
                 paymentMethod === option.value
-                  ? "border-ink bg-ink text-paper"
-                  : "border-line-strong bg-white text-ink-2 hover:border-ink hover:text-ink"
+                  ? "border-coral bg-coral-tint text-coral-deep"
+                  : ""
               }`}
+              data-active={paymentMethod === option.value}
               key={option.value}
               onClick={() => setPaymentMethod(option.value)}
               type="button"
@@ -97,11 +98,11 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
       </fieldset>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-2" htmlFor="destination">
+        <label className="kp-field-label" htmlFor="destination">
           Stellar testnet destination
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
+          className="kp-input"
           id="destination"
           onChange={(event) => setDestination(event.target.value)}
           placeholder="G… 56 characters"
@@ -114,11 +115,11 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-2" htmlFor="memo">
+        <label className="kp-field-label" htmlFor="memo">
           Memo (optional)
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-sky-deep"
+          className="kp-input"
           id="memo"
           maxLength={28}
           onChange={(event) => setMemo(event.target.value)}
@@ -127,13 +128,13 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
       </div>
 
       {fieldError !== null && (
-        <p className="rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
+        <p className="kp-notice" data-tone="warning" role="alert">
           {fieldError}
         </p>
       )}
 
       <button
-        className="h-12 rounded-xl bg-ink text-sm font-medium text-paper transition-colors hover:bg-ink-deep disabled:opacity-50"
+        className="kp-primary-button w-full"
         disabled={busy}
         type="submit"
       >

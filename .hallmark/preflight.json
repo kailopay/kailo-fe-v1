@@ -1,0 +1,16 @@
+{
+  "scanned_at": "2026-08-28",
+  "target": "consumer exchange and developer workspace",
+  "framework": "Next.js App Router with Tailwind CSS v4",
+  "font_stack": "Plus Jakarta Sans with an offline-safe sans-serif fallback",
+  "motion_stance": "motion-on, limited to route state and quiet success reveal",
+  "existing_entry_stylesheet": "app/globals.css",
+  "token_file": "tokens.css",
+  "preserved_constraints": [
+    "Sandbox and Stellar Testnet are always visible",
+    "No real money moves",
+    "Amounts and API identifiers remain readable and wrapped",
+    "No monospace UI treatment or centered-dot context lines",
+    "Developer workspace remains separate from the consumer exchange"
+  ]
+}

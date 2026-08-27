@@ -37,11 +37,12 @@ export function OfframpCreateForm({ busy, onSubmit }: OfframpCreateFormProps) {
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-2" htmlFor="sell-amount">
+        <label className="kp-field-label" htmlFor="sell-amount">
           XLM to sell
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm tnum outline-none transition-colors focus:border-aqua-deep"
+          className="kp-input tnum"
+          data-tone="sell"
           id="sell-amount"
           inputMode="decimal"
           onChange={(event) => setAmount(event.target.value)}
@@ -55,11 +56,12 @@ export function OfframpCreateForm({ busy, onSubmit }: OfframpCreateFormProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-2" htmlFor="destination-token">
+        <label className="kp-field-label" htmlFor="destination-token">
           Sandbox payout reference
         </label>
         <input
-          className="h-11 rounded-xl border border-line-strong bg-white px-4 text-sm outline-none transition-colors focus:border-aqua-deep"
+          className="kp-input"
+          data-tone="sell"
           id="destination-token"
           onChange={(event) => setDestinationToken(event.target.value)}
           placeholder="sandbox-bank-001"
@@ -72,13 +74,13 @@ export function OfframpCreateForm({ busy, onSubmit }: OfframpCreateFormProps) {
       </div>
 
       {fieldError !== null && (
-        <p className="rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
+        <p className="kp-notice" data-tone="warning" role="alert">
           {fieldError}
         </p>
       )}
 
       <button
-        className="h-12 rounded-xl bg-aqua-deep text-sm font-semibold text-white transition-colors hover:bg-aqua-deep/90 disabled:opacity-50"
+        className="kp-primary-button w-full"
         disabled={busy}
         type="submit"
       >

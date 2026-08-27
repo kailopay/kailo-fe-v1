@@ -52,23 +52,23 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
       </div>
 
       {error !== null && (
-        <p className="mt-4 rounded-xl bg-sun-tint px-4 py-3 text-sm text-sun-deep" role="alert">
+        <p className="kp-notice mt-4" data-tone="warning" role="alert">
           {error}
         </p>
       )}
 
       {orders.length === 0 && error === null ? (
-        <p className="mt-4 rounded-[20px] border border-line bg-white px-5 py-6 text-sm leading-6 text-ink-3">
+        <p className="kp-dev-empty mt-4">
           {loading ? "Loading your orders." : "No orders for this key yet."}
         </p>
       ) : (
-        <ul className="mt-4 flex flex-col gap-3">
+        <ul className="mt-4 border-t border-line">
           {orders.map((order) => {
             const style = statusStyle(order.status);
             return (
               <li key={order.id}>
                 <button
-                  className="flex w-full flex-wrap items-center justify-between gap-3 rounded-[20px] border border-line bg-white px-5 py-4 text-left transition-colors hover:border-ink"
+                  className="kp-dev-row w-full text-left transition-colors hover:text-coral-deep"
                   onClick={() => onOpenOrder(order)}
                   type="button"
                 >
@@ -94,7 +94,7 @@ export function OrderHistory({ apiKey, onOpenOrder, refreshKey }: OrderHistoryPr
 
       {nextCursor !== "" && (
         <button
-          className="mt-4 h-11 rounded-xl border border-line-strong px-5 text-sm font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+          className="kp-secondary-button mt-4 disabled:opacity-50"
           disabled={loading}
           onClick={() => void loadPage(nextCursor, false)}
           type="button"
