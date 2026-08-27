@@ -79,23 +79,23 @@ git commit -m "feat(ui): add consumer-first application shell"
 **Interfaces:**
 - `ConsumerFlow` accepts `{ initialDirection: "buy" | "sell" }` and keeps Buy/Sell state in the URL-safe route.
 - `LiveRateStrip` accepts a `Quote | null` and distinguishes the live-rate handoff from the locked quote returned by order creation.
-- `RouteVisual` accepts `direction`, `sourceLabel`, `destinationLabel`, and an optional quote amount.
+- `RouteVisual` accepts `direction` and renders the consumer route rail without technical identifiers.
 
-- [ ] **Step 1: Add failing boundary-focused tests for direction and rate labels**
+- [x] **Step 1: Add failing boundary-focused tests for direction and rate labels**
 
 Because this repository has no test runner yet, first add a small test runner setup using Node 24's built-in `node:test` runner with TypeScript type stripping and test the pure rate-label and direction helpers before wiring components. The tests must cover buy direction, sell direction, locked quote expiry, and unavailable quote copy.
 
-- [ ] **Step 2: Run the focused tests and confirm RED**
+- [x] **Step 2: Run the focused tests and confirm RED**
 
 Run `npm test -- --run features/consumer/consumer-flow.test.ts`. Expected result: failure because the helpers do not exist.
 
 - [x] **Step 3: Implement the minimal pure helpers and test them GREEN**
 
-Keep the helpers string-safe. A buy view says `IDR to XLM`; a sell view says `XLM to IDR`. A quote with an expiry says `Rate locked`; no quote says `Rate appears when the order is created` until the backend provides quote preview.
+Keep the helpers string-safe. A buy view says `IDR to XLM`; a sell view says `XLM to IDR`. A quote with an expiry says `Rate locked`; no quote says `Live rate at checkout` until the backend provides quote preview.
 
 - [x] **Step 4: Build the consumer route composition**
 
-Use a single large action surface rather than a dashboard grid. Buy uses coral, Sell uses aqua, Testnet uses lilac, and status colors remain semantic. The amount and direction are the main visual anchor.
+Use a single large action surface rather than a dashboard grid. Buy uses coral, Sell uses aqua, Testnet uses lilac, and status colors remain semantic. The amount and direction are the main visual anchor. The approved follow-up visual direction is a soft pastel exchange ticket with a currency rail, progressive details, and one primary action.
 
 - [x] **Step 5: Add the route pages and make `/dashboard` the consumer home**
 
@@ -111,6 +111,15 @@ Run `npm test -- --run features/consumer/consumer-flow.test.ts` and `npm run lin
 git add app/(session)/dashboard/page.tsx app/(session)/buy/page.tsx app/(session)/sell/page.tsx features/consumer
 git commit -m "feat(consumer): add colorful buy and sell workspace"
 ```
+
+### Approved visual follow-up: pastel exchange pocket
+
+- [x] Extend the consumer-first shell into a compact product header while
+  keeping Developer Mode in its own navigation shell.
+- [x] Replace the public compass/proof-sheet landing composition with the same
+  consumer exchange language and an honest `Rate at checkout` presentation.
+- [x] Keep the consumer route visually focused on `You pay`, `You receive`,
+  destination, payment method, and sandbox/testnet context.
 
 ### Task 3: Extend the typed API boundary for Week 2 off-ramp data
 

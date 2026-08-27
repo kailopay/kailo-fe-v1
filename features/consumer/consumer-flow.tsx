@@ -117,7 +117,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
           <div aria-label="Transaction direction" className="flex rounded-[18px] bg-paper-recess p-1.5">
             <button
               aria-pressed={isBuy}
-              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${isBuy ? tone.selected : `text-ink-2 ${tone.hover}`}`}
+              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${isBuy ? toneClasses.buy.selected : "text-ink-2 hover:bg-coral-tint hover:text-coral-deep"}`}
               onClick={() => selectDirection("buy")}
               type="button"
             >
@@ -125,7 +125,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
             </button>
             <button
               aria-pressed={!isBuy}
-              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${!isBuy ? tone.selected : `text-ink-2 ${tone.hover}`}`}
+              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-colors ${!isBuy ? toneClasses.sell.selected : "text-ink-2 hover:bg-aqua-tint hover:text-aqua-deep"}`}
               onClick={() => selectDirection("sell")}
               type="button"
             >

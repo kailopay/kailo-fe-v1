@@ -53,7 +53,7 @@ function ConsumerChrome({ pathname, user, children }: SessionChromeProps & { pat
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <div className="hidden xl:flex">
+            <div className="hidden md:flex">
               <SandboxBadges />
             </div>
             <NetworkSelector />
@@ -68,7 +68,7 @@ function ConsumerChrome({ pathname, user, children }: SessionChromeProps & { pat
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-3 border-t border-line/60 px-5 py-2.5 sm:hidden">
+        <div className="flex items-center justify-between gap-3 border-t border-line/60 px-5 py-2.5 md:hidden">
           <SandboxBadges />
           <span className="text-xs font-semibold text-ink-3">Testnet only</span>
         </div>
@@ -120,7 +120,7 @@ function DeveloperChrome({ pathname, user, children }: SessionChromeProps & { pa
           <SignOutButton />
         </div>
       </aside>
-      <main className="min-w-0 flex-1 pb-24 md:p-8 md:pb-8">{children}</main>
+      <main className="min-w-0 flex-1 p-5 pb-24 md:p-8 md:pb-8">{children}</main>
       <nav aria-label="Mobile developer navigation" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-3 py-2 backdrop-blur md:hidden">
         <ul className="mx-auto grid max-w-md grid-cols-4 gap-1 text-center text-xs font-semibold">
           {developerItems.map((item) => (
@@ -137,6 +137,7 @@ function DeveloperChrome({ pathname, user, children }: SessionChromeProps & { pa
 }
 
 function isActivePath(pathname: string, href: string): boolean {
+  if (pathname === "/dashboard" && href === "/buy") return true;
   return pathname === href || (href !== "/developer" && pathname.startsWith(`${href}/`));
 }
 

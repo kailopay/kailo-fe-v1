@@ -15,9 +15,12 @@ export default async function ProfilePage() {
   if (user === null) redirect("/login");
 
   return (
-    <div className="max-w-xl">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
+    <div className="mx-auto w-full max-w-xl px-5 py-10 sm:px-8 lg:py-12">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold tracking-[-0.06em] text-ink">Profile</h1>
+          <p className="mt-3 text-sm leading-6 text-ink-2">Manage your account and choose whether to open the developer workspace.</p>
+        </div>
         <p className="text-xs text-ink-3">
           {user.email_verified ? "email verified" : "email not verified"}
         </p>

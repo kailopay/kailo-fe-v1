@@ -84,8 +84,8 @@ wiped on logout; 401 means redirect to sign-in; two error envelope styles
   virtual account, rupiah).
 - Pinned by the user: rounded surfaces, a warm near-white ground, deep navy
   ink, and a colorful pastel palette. Coral marks Buy, aqua marks Sell, lilac
-  marks Testnet, and mango marks rate information. The star compass remains
-  the public signature figure.
+  marks Testnet, and mango marks rate information. The exchange rail inside a
+  soft route ticket is the public signature figure.
 - UI copy uses Plus Jakarta Sans and readable spacing. Technical identifiers
   use contrast and wrapping instead of a monospace font or dot-separated
   context lines.
