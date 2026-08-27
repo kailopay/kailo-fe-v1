@@ -49,7 +49,12 @@ export default async function DeveloperPage() {
     <div className="max-w-2xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">API keys</h1>
-        <p className="font-mono text-xs text-ink-3">pk_test · sandbox only</p>
+        <div className="flex items-center gap-3">
+          <Link className="text-sm font-semibold text-lilac-deep hover:text-ink" href="/developer/playground">
+            Open Playground
+          </Link>
+          <p className="text-xs text-ink-3">pk_test keys, sandbox only</p>
+        </div>
       </div>
       <p className="mt-3 max-w-[70ch] text-sm leading-6 text-ink-2">
         Keys authenticate the order API. The full key appears exactly once

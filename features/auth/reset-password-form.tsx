@@ -56,7 +56,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · password reset</p>
+        <p className="text-xs text-ink-3">Choose a new password</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Reset your password</h1>
       </div>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { normalizeXlmAmount } from "@/lib/format-asset";
 import { formatIdrInput, parseIdrInput } from "@/lib/format-money";
 import { SandboxBadges } from "@/components/sandbox-badges";
 import { AmountField } from "./amount-field";
@@ -56,7 +57,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
         setError("The memo must be 28 characters or fewer.");
         return;
       }
-    } else if (!/^\d+(\.\d{1,7})?$/.test(xlmAmount.trim()) || xlmAmount.trim() === "0") {
+    } else if (normalizeXlmAmount(xlmAmount) === null) {
       setError("Enter the amount of XLM you want to sell.");
       return;
     } else if (sandboxPayoutReference.trim().length === 0) {
@@ -150,7 +151,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
 
             {error !== null && <p className="rounded-xl bg-sun-tint px-4 py-3 text-sm leading-6 text-sun-deep" role="alert">{error}</p>}
 
-            <button className={`mt-1 h-13 rounded-xl px-5 text-sm font-bold text-ink transition-colors ${direction === "buy" ? "bg-coral hover:bg-coral/85" : "bg-aqua hover:bg-aqua/85"}`} type="submit">
+            <button className={`mt-1 h-12 rounded-xl px-5 text-sm font-bold text-ink transition-colors ${direction === "buy" ? "bg-coral hover:bg-coral/85" : "bg-aqua hover:bg-aqua/85"}`} type="submit">
               {reviewing ? "Route details ready" : "Review route"}
             </button>
           </form>
@@ -158,8 +159,8 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
           {reviewing && (
             <div className="mt-4 rounded-2xl border border-lilac/35 bg-lilac-tint p-4" role="status">
               <p className="text-sm font-bold text-lilac-deep">Your route is ready for a secured quote</p>
-              <p className="mt-1 text-sm leading-6 text-lilac-deep/80">The current backend locks the quote when the order is created. Continue through the sandbox checkout to receive the live execution rate.</p>
-              <Link className="mt-3 inline-flex h-10 items-center rounded-xl bg-ink px-4 text-sm font-bold text-paper hover:bg-ink-deep" href="/developer/playground">Continue to sandbox checkout</Link>
+              <p className="mt-1 text-sm leading-6 text-lilac-deep/80">The current backend locks the quote when the order is created. Open Developer Mode to create this route through the live sandbox API.</p>
+              <Link className="mt-3 inline-flex h-10 items-center rounded-xl bg-ink px-4 text-sm font-bold text-paper hover:bg-ink-deep" href="/developer/playground">Open Developer Mode</Link>
             </div>
           )}
         </section>

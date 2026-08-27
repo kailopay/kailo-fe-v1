@@ -16,7 +16,7 @@ export default async function RegisterPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · register</p>
+        <p className="text-xs text-ink-3">Create your KailoPay account</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Create an account</h1>
         <p className="mt-2 text-sm leading-6 text-ink-2">
           Already registered?{" "}

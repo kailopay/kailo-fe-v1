@@ -33,7 +33,7 @@ export function ConsumerShellNav({ developerEnabled }: ConsumerShellNavProps): R
           className="mt-2 block rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-2 transition-colors hover:bg-lilac-tint hover:text-lilac-deep"
           href={developerEnabled ? "/developer" : "/profile"}
         >
-          Developer Mode
+          {developerEnabled ? "Developer Mode" : "Enable Developer Mode"}
         </Link>
       </div>
     </>

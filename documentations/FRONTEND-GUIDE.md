@@ -1,4 +1,4 @@
-# KailoPay frontend guide (Week 1 backend handoff)
+# KailoPay frontend guide (Week 2 backend handoff)
 
 This guide is for the frontend developer or agent building against the KailoPay
 backend. It describes the product, exactly which backend capabilities exist
@@ -13,10 +13,12 @@ KailoPay is an Indonesia-first fiat on-ramp/off-ramp for Stellar. The first
 release (`v0.1.0`, 30-day sandbox sprint) proves one corridor in
 **sandbox/testnet form only**:
 
-1. A developer creates an IDR→XLM order and pays through a **Xendit sandbox**
-   QRIS or BRI virtual-account checkout.
-2. Xendit calls the backend; payment is verified and reconciled.
-3. A worker transfers reserved **Stellar testnet XLM** from a treasury account
+1. A consumer chooses Buy or Sell in the primary workspace.
+2. A developer can opt into Developer Mode, create an IDR→XLM order, and pay
+   through a **Xendit sandbox** QRIS or BRI virtual-account checkout.
+3. The Week 2 sell path accepts XLM and records a simulated IDR bank payout.
+4. For Buy, Xendit calls the backend; payment is verified and reconciled.
+5. A worker transfers reserved **Stellar testnet XLM** from a treasury account
    to the customer's testnet address.
 
 The money is never real. Two product rules follow from that:
@@ -27,8 +29,9 @@ The money is never real. Two product rules follow from that:
   `"network": "stellar_testnet"`.
 - The UI must never imply real-money settlement, KYC, or production readiness.
 
-What is deliberately out of scope for now: off-ramp (sell flow), webhooks,
-SEP-24 anchor flows, federation, rate limits, mainnet.
+What is deliberately out of scope for now: retail-session order creation,
+quote preview before order creation, webhooks, SEP-24 anchor flows,
+federation, rate limits, production payout destinations, and mainnet.
 
 ## 2. Running the backend locally
 
@@ -283,6 +286,36 @@ echoes `X-Request-ID` as a header.
   expiry (the backend expires the order and releases the XLM reservation
   automatically).
 
+### `POST /v1/offramps` (Week 2, requires `Idempotency-Key` header)
+
+The current sell endpoint is API-key scoped and sandbox-only. It accepts the
+exact XLM amount to deposit and a test payout reference:
+
+```json
+{
+  "asset": {
+    "network": "stellar_testnet",
+    "code": "XLM",
+    "amount": "25.0000000"
+  },
+  "withdrawal": {
+    "currency": "IDR",
+    "method": "sandbox_bank_transfer",
+    "destination_token": "sandbox-bank-001"
+  }
+}
+```
+
+The response uses the common order envelope. Sell orders may include
+`deposit_transaction_hash` and a `payout` object with `amount_minor` as a
+string, `state`, `simulated`, and a sandbox disclosure. The current backend
+may omit the deposit account from `stellar_destination`; the UI must show a
+clear unavailable-instructions state and must never invent an address.
+
+Sell statuses are `asset_pending`, `asset_received`,
+`retirement_processing`, `withdrawal_processing`, `completed`,
+`asset_invalid`, `retirement_failed`, and `withdrawal_failed`.
+
 ### Reading orders
 
 - `GET /v1/orders/{id}` returns 404 for missing and cross-client orders
@@ -302,6 +335,10 @@ echoes `X-Request-ID` as a header.
 | `expired` | Unpaid past expiry | Explain + offer new order |
 | `payment_failed` | Checkout permanently rejected (see `failure_code`) | Error + retry as new order |
 | `stellar_failed` | Transfer permanently failed after payment | "Paid. Support will resolve this" with order id and request ids; do not offer re-payment |
+| `asset_pending` | Sell order is waiting for the XLM deposit | Show the exact amount and deposit account when provided |
+| `asset_received` → `withdrawal_processing` | XLM received and payout is being prepared | Show the sell route and simulated payout state |
+| `asset_invalid` / `retirement_failed` / `withdrawal_failed` | Sell route needs attention | Explain the failed step and keep the order id for support |
+| `completed` on a sell order | IDR payout simulation recorded | Show the payout disclosure and any deposit transaction link |
 
 Transitions are one-way; there is no cancel endpoint yet. Polling `GET
 /v1/orders/{id}` is the intended integration (webhooks come later); poll
@@ -317,7 +354,8 @@ gently, e.g. every 3-5 seconds while `payment_pending`, and back off after.
 Do not build against any of these:
 
 - Retail-session order creation/reading (orders are API-key-scoped only).
-- Off-ramp / sell flow, withdrawal destinations.
+- Production withdrawal destinations. The Week 2 sell endpoint only accepts a
+  sandbox payout reference and records a simulated bank transfer.
 - Outgoing developer webhooks (event subscription UI has no backend yet).
 - SEP-24 interactive flows, `stellar.toml`, federation.
 - Quote preview endpoint (`GET` quote). Quotes are only produced inline by
@@ -339,7 +377,7 @@ Do not build against any of these:
   new one for a new intent.
 6. Treat the API as at-least-once: a 200 replay response is normal, not an
   error.
-6. Do not expose raw error text from network failures; use the stable `code`
+7. Do not expose raw error text from network failures; use the stable `code`
    and keep `request_id` available for support.
 
 ## 9. Screen map
@@ -354,15 +392,17 @@ the contract):
 | `/auth/google/callback` | public | Google post-login landing target (set as `AUTH_SUCCESS_REDIRECT_URL`) |
 | `/auth/verify-email` | public | Reads `?token=` from the console-emailed link, POSTs `/auth/email/verify` |
 | `/auth/reset-password` | public | Reads `?token=`, collects a new password, POSTs `/auth/password/reset` |
+| `/dashboard`, `/buy`, `/sell` | session | Consumer-first Buy and Sell route workspace with Sandbox and Stellar Testnet labels |
+| `/activity` | session | Consumer activity entry point; full history remains API-key scoped until retail-session orders exist |
 | `/profile` | session | `GET/PATCH /auth/me` (display name, Developer Mode toggle), avatar upload/remove |
 | `/developer` | session + Developer Mode | API key list/create/revoke, one-time key reveal, playground entry |
-| `/developer/playground` | session + Developer Mode | Paste-your-own `pk_test_` key (memory only) → create order, show QRIS QR / BRI VA, poll status |
-| `/developer/orders/:id` | session + Developer Mode (key) | Order detail: quote, checkout, status timeline, testnet explorer link on completion |
+| `/developer/playground` | session + Developer Mode | Paste-your-own `pk_test_` key (memory only) → create Buy or Sell order, show checkout or deposit state, poll status |
+| `/developer/orders/:id` | session + Developer Mode (key) | Hands the order id to the key-holding playground for quote, route status, payout, and explorer links |
 | `/auth/expired`, error states | public | Session-expired / generic error routes |
 
-Status timeline per order: `created → payment_pending → stellar_processing →
-completed` with terminal `expired` / `payment_failed` / `stellar_failed` states
-mapped as in §5.
+Status timeline per order: Buy uses `created → payment_pending →
+stellar_processing → completed`; Sell uses `asset_pending → asset_received →
+withdrawal_processing → completed`. Terminal states are mapped as in §5.
 
 ## 10. Suggested build order
 
@@ -371,11 +411,13 @@ mapped as in §5.
    profile edit, and avatar upload.
 2. Developer section: opt-in Developer Mode, API key create/list/revoke with
    one-time display.
-3. Developer playground (paste-your-own-key, in-memory only): create on-ramp
-   order → render QRIS QR / BRI VA → poll order status → success screen with
-   the testnet explorer link.
-4. Polish: error states per §5, sandbox labels, amount input that formats
-   IDR with thousand separators and serializes as a minor-unit string.
+3. Consumer workspace: Buy and Sell route entry points, live-rate state copy,
+   Sandbox and Stellar Testnet labels, and Activity entry point.
+4. Developer playground (paste-your-own-key, in-memory only): create Buy or
+   Sell order → render QRIS, BRI VA, or deposit state → poll order status →
+   show the appropriate settlement proof.
+5. Polish: error states per §5, and amount inputs that serialize IDR and XLM
+   as strings.
 
 The product-level acceptance criteria for the web app live in
 `documentations/PRD.md` (§7 journeys, §8.6) and the phase plan in

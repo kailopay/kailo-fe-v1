@@ -38,27 +38,27 @@
 - `NetworkSelector` renders Testnet as active and Mainnet as disabled with a truthful explanation.
 - `ConsumerShell` renders Buy, Sell, Activity, and Profile navigation without exposing developer-only vocabulary.
 
-- [ ] **Step 1: Add the visual tokens and sans-serif rule**
+- [x] **Step 1: Add the visual tokens and sans-serif rule**
 
 Add named tokens for milk, coral, aqua, lilac, mango, and the existing navy and paper colors. Remove the IBM Plex Mono import and map all UI typography to the sans token. Keep numeric tabular figures through `font-feature-settings`, not a monospace font.
 
-- [ ] **Step 2: Add the network selector**
+- [x] **Step 2: Add the network selector**
 
 Render a compact selector with Testnet selected and Mainnet disabled. The disabled option explains that mainnet is not part of the sandbox release. Do not add a fake mainnet route.
 
-- [ ] **Step 3: Replace the desktop-only developer sidebar with a consumer shell**
+- [x] **Step 3: Replace the desktop-only developer sidebar with a consumer shell**
 
 Make the primary shell action-first and responsive. Developer links remain available from Profile or an explicit Developer Mode area. Add a mobile bottom navigation with single-line labels.
 
-- [ ] **Step 4: Remove centered-dot separators and monospace classes from the touched shell**
+- [x] **Step 4: Remove centered-dot separators and monospace classes from the touched shell**
 
 Use normal sans-serif text and separate environment badges. Keep technical values readable through spacing and contrast rather than a different font family.
 
-- [ ] **Step 5: Run the FE linter**
+- [x] **Step 5: Run the FE linter**
 
 Run `npm run lint`. Expected result: exit code 0.
 
-- [ ] **Step 6: Commit the shell slice**
+- [x] **Step 6: Commit the shell slice**
 
 ```powershell
 git add app/globals.css app/layout.tsx components/sandbox-badges.tsx app/(session)/layout.tsx components/network-selector.tsx features/consumer/consumer-shell.tsx
@@ -78,7 +78,7 @@ git commit -m "feat(ui): add consumer-first application shell"
 
 **Interfaces:**
 - `ConsumerFlow` accepts `{ initialDirection: "buy" | "sell" }` and keeps Buy/Sell state in the URL-safe route.
-- `LiveRateStrip` accepts a `Quote | null` and distinguishes `Indicative rate`, `Locked rate`, and `Rate unavailable` states.
+- `LiveRateStrip` accepts a `Quote | null` and distinguishes the live-rate handoff from the locked quote returned by order creation.
 - `RouteVisual` accepts `direction`, `sourceLabel`, `destinationLabel`, and an optional quote amount.
 
 - [ ] **Step 1: Add failing boundary-focused tests for direction and rate labels**
@@ -89,23 +89,23 @@ Because this repository has no test runner yet, first add a small test runner se
 
 Run `npm test -- --run features/consumer/consumer-flow.test.ts`. Expected result: failure because the helpers do not exist.
 
-- [ ] **Step 3: Implement the minimal pure helpers and test them GREEN**
+- [x] **Step 3: Implement the minimal pure helpers and test them GREEN**
 
 Keep the helpers string-safe. A buy view says `IDR to XLM`; a sell view says `XLM to IDR`. A quote with an expiry says `Rate locked`; no quote says `Rate appears when the order is created` until the backend provides quote preview.
 
-- [ ] **Step 4: Build the consumer route composition**
+- [x] **Step 4: Build the consumer route composition**
 
 Use a single large action surface rather than a dashboard grid. Buy uses coral, Sell uses aqua, Testnet uses lilac, and status colors remain semantic. The amount and direction are the main visual anchor.
 
-- [ ] **Step 5: Add the route pages and make `/dashboard` the consumer home**
+- [x] **Step 5: Add the route pages and make `/dashboard` the consumer home**
 
 The authenticated landing page opens on Buy. `/buy` and `/sell` preserve the same shell and flow. Keep the existing developer routes available but visually separate.
 
-- [ ] **Step 6: Run tests and lint**
+- [x] **Step 6: Run tests and lint**
 
 Run `npm test -- --run features/consumer/consumer-flow.test.ts` and `npm run lint`. Expected result: focused tests pass and lint exits 0.
 
-- [ ] **Step 7: Commit the consumer workspace slice**
+- [x] **Step 7: Commit the consumer workspace slice**
 
 ```powershell
 git add app/(session)/dashboard/page.tsx app/(session)/buy/page.tsx app/(session)/sell/page.tsx features/consumer
@@ -125,7 +125,7 @@ git commit -m "feat(consumer): add colorful buy and sell workspace"
 - `Order` supports on-ramp and off-ramp statuses, optional payment method, payout simulation, and deposit transaction hash.
 - `routeStatus(order)` maps both state machines into consumer-safe labels and step positions.
 
-- [ ] **Step 1: Write parser and request tests first**
+- [x] **Step 1: Write parser and request tests first**
 
 Cover the current Week 2 response fields: `asset_pending`, `asset_received`, `retirement_processing`, `withdrawal_processing`, `completed` with `payout`, and the on-ramp response with checkout. Assert that no numeric conversion occurs and that the off-ramp body contains no undocumented fields.
 
@@ -133,15 +133,15 @@ Cover the current Week 2 response fields: `asset_pending`, `asset_received`, `re
 
 Run `npm test -- --run lib/api/orders.test.ts`. Expected result: failure because off-ramp types and request functions are missing.
 
-- [ ] **Step 3: Implement the minimal parser and API functions**
+- [x] **Step 3: Implement the minimal parser and API functions**
 
 Parse optional `payment_method`, `payout`, and `deposit_transaction_hash` fields at the API boundary. Infer the direction only from explicit off-ramp statuses or payout/deposit fields because the current backend response does not yet include a direction field.
 
-- [ ] **Step 4: Run the focused tests and confirm GREEN**
+- [x] **Step 4: Run the focused tests and confirm GREEN**
 
 Run `npm test -- --run lib/api/orders.test.ts`. Expected result: all parser and request tests pass.
 
-- [ ] **Step 5: Commit the API contract slice**
+- [x] **Step 5: Commit the API contract slice**
 
 ```powershell
 git add lib/api/types.ts lib/api/orders.ts features/orders/route-status.ts lib/api/orders.test.ts package.json package-lock.json
@@ -151,21 +151,18 @@ git commit -m "feat(api): wire the Week 2 off-ramp contract"
 ### Task 4: Wire consumer payment and sell settlement states
 
 **Files:**
-- Create: `features/consumer/consumer-order-flow.tsx`
-- Create: `features/consumer/consumer-order-summary.tsx`
 - Modify: `features/orders/order-detail.tsx`
 - Modify: `features/orders/payment-panel.tsx`
 - Modify: `features/orders/order-history.tsx`
 - Modify: `features/orders/status.ts`
 - Create: `app/(session)/activity/page.tsx`
-- Create: `app/(session)/orders/[id]/page.tsx`
 
 **Interfaces:**
 - Buy uses the existing QRIS and BRI VA checkout response and polling behavior.
 - Sell uses the Week 2 deposit instruction response and simulated payout disclosure.
 - `OrderDetail` renders a route timeline for both directions without exposing API keys or request internals to consumers.
 
-- [ ] **Step 1: Add failing state-mapping tests**
+- [x] **Step 1: Add failing state-mapping tests**
 
 Test that buy statuses show payment steps, sell statuses show deposit and payout steps, and terminal failures do not offer a second payment for the same order.
 
@@ -173,23 +170,23 @@ Test that buy statuses show payment steps, sell statuses show deposit and payout
 
 Run `npm test -- --run features/orders/route-status.test.ts`. Expected result: failure because the shared route mapping is missing.
 
-- [ ] **Step 3: Implement the shared status mapping and order presentation**
+- [x] **Step 3: Implement the shared status mapping and order presentation**
 
 Use the happy action colors only for direction. Use semantic state colors for success, waiting, and failure. Show live quote source time, locked expiry, spread, and payout simulation disclosure in the summary.
 
-- [ ] **Step 4: Wire on-ramp checkout and off-ramp deposit instructions**
+- [x] **Step 4: Wire on-ramp checkout and off-ramp deposit instructions**
 
 Reuse the documented `GET /v1/orders/{id}` polling. QRIS and VA continue using their existing presentation fields. Off-ramp shows the deposit account and memo when the backend provides them; if the current response omits the deposit account, show an explicit unavailable-instructions state rather than inventing one.
 
-- [ ] **Step 5: Add activity navigation**
+- [x] **Step 5: Add activity navigation**
 
 Render recent routes as a personal list, not KPI cards. Use the existing API-key-scoped list for Developer Mode and keep the consumer route ready for the future retail-session list endpoint.
 
-- [ ] **Step 6: Run tests, lint, and build**
+- [x] **Step 6: Run tests, lint, and build**
 
 Run the focused tests, `npm run lint`, and `npm run build`. Expected result: all pass with no TypeScript errors.
 
-- [ ] **Step 7: Commit the order experience slice**
+- [x] **Step 7: Commit the order experience slice**
 
 ```powershell
 git add app/(session)/activity app/(session)/orders features/consumer features/orders
@@ -216,11 +213,11 @@ git commit -m "feat(consumer): add buy and sell settlement journeys"
 
 Cover Developer Mode off, on, and key-revoked states. Assert that disabling the mode does not imply key revocation and that key values remain memory-only.
 
-- [ ] **Step 2: Replace technical typography and separators**
+- [x] **Step 2: Replace technical typography and separators**
 
 Remove `font-mono` from all touched developer copy. Present API identifiers in visually distinct regular-font panels with wrapping and copy affordances. Replace dot-separated context lines with labels and spacing.
 
-- [ ] **Step 3: Keep the developer shell visually secondary**
+- [x] **Step 3: Keep the developer shell visually secondary**
 
 Add clear links from Profile to API keys, playground, and docs. Keep Buy, Sell, and Activity available when Developer Mode is on.
 
@@ -228,7 +225,7 @@ Add clear links from Profile to API keys, playground, and docs. Keep Buy, Sell, 
 
 Run the playground against the current backend when available. Confirm on-ramp creation, idempotent retry, QRIS or VA rendering, polling, and testnet explorer linking remain intact.
 
-- [ ] **Step 5: Run lint and build**
+- [x] **Step 5: Run lint and build**
 
 Run `npm run lint` and `npm run build`. Expected result: exit code 0.
 
@@ -246,7 +243,7 @@ git commit -m "feat(developer): align technical workspace with consumer shell"
 - Modify: `documentations/FRONTEND-GUIDE.md`
 - Create: `docs/superpowers/plans/2026-08-28-consumer-developer-ui.md`
 
-- [ ] **Step 1: Document the new screen map**
+- [x] **Step 1: Document the new screen map**
 
 Record Buy, Sell, Activity, Profile, Developer Mode, API keys, playground, and order detail ownership. State that current order APIs remain API-key-authenticated and that retail-session creation and quote preview are backend follow-ups.
 

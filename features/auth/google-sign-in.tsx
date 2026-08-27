@@ -46,8 +46,8 @@ export function GoogleSignIn() {
           <GoogleMark muted />
           <span className="text-sm font-medium text-ink-3">Sign in with Google</span>
         </div>
-        <p className="text-center font-mono text-xs text-ink-3">
-          reserved · arrives once google credentials are configured
+        <p className="text-center text-xs text-ink-3">
+          Reserved for a later release, once Google credentials are configured
         </p>
       </div>
     );

@@ -20,7 +20,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · email and password</p>
+        <p className="text-xs text-ink-3">Sign in with email and password</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Sign in</h1>
         <p className="mt-2 text-sm leading-6 text-ink-2">
           Sessions are an opaque cookie held server-side. New here?{" "}

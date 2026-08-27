@@ -211,11 +211,11 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         {hold !== null && (
           <div className="mt-4 rounded-[20px] border border-line bg-sky-tint px-5 py-4" role="status">
             <p className="text-sm font-medium text-sky-deep">
-              Processing the checkout with the payment provider.
+              {hold.direction === "onramp" ? "Processing the checkout with the payment provider." : "Processing the sell route."}
             </p>
             <p className="mt-1 text-sm leading-6 text-sky-deep/80">
               Your order exists and its outcome is being reconciled. Do not
-              create it again; check back with the same request.
+              create it again. Check back with the same request.
             </p>
             <button
               className="mt-3 h-11 rounded-xl border border-sky-deep/40 px-4 text-sm font-medium text-sky-deep transition-colors hover:border-sky-deep disabled:opacity-50"

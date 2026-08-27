@@ -33,7 +33,7 @@ export function VerifyPrompt({ email }: VerifyPromptProps) {
   return (
     <div className="flex flex-col gap-5 rounded-[20px] border border-line bg-white p-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · flow b</p>
+        <p className="text-xs text-ink-3">Email verification</p>
         <h2 className="mt-2 text-xl font-semibold tracking-tight">Verify your email</h2>
         <p className="mt-3 text-sm leading-6 text-ink-2">
           One more step for <span className="font-medium text-ink">{email}</span>:

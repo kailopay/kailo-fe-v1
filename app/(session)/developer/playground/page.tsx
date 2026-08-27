@@ -19,10 +19,10 @@ export default async function PlaygroundPage(
         <SandboxBadges />
       </div>
       <p className="mt-3 max-w-[70ch] text-sm leading-6 text-ink-2">
-        Create a real sandbox on-ramp order with your own test key: pay the
-        QRIS or BRI virtual account in the Xendit sandbox and watch testnet
-        XLM arrive. Locally the Xendit callback needs a tunnel or the
-        dashboard simulator, or the order stays in payment_pending.
+        Use your own test key to create a Buy or Sell order against the
+        sandbox API. Buy orders use the QRIS or BRI virtual account flow.
+        Sell orders use a test XLM deposit and a simulated IDR payout. No real
+        money moves.
       </p>
       <div className="mt-8">
         <PlaygroundFlow initialOrderId={initialOrderId} />

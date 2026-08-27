@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · password reset request</p>
+        <p className="text-xs text-ink-3">Request a password reset</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Forgot your password?</h1>
         <p className="mt-2 text-sm leading-6 text-ink-2">
           Enter your email to request a reset link. In this sandbox the link

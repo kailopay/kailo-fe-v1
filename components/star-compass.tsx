@@ -90,7 +90,7 @@ export function StarCompass() {
           fill="var(--ink-3)"
           fontSize="11"
           textAnchor="middle"
-          fontFamily="var(--font-mono)"
+          fontFamily="var(--font-sans)"
         >
           {d.label}
         </text>
@@ -130,8 +130,8 @@ export function StarCompass() {
 
       {/* the plotted corridor: idr port to xlm star */}
       <circle cx={168} cy={432} r={4.5} fill="var(--ink)" />
-      <text x={150} y={458} fill="var(--ink-2)" fontSize="12.5" fontFamily="var(--font-mono)">
-        idr · port
+      <text x={150} y={458} fill="var(--ink-2)" fontSize="12.5" fontFamily="var(--font-sans)">
+        IDR port
       </text>
 
       {/* bearing line, drawn once */}
@@ -162,8 +162,8 @@ export function StarCompass() {
         ))}
         <circle cx={478} cy={166} r={2.75} fill="var(--gold)" />
       </g>
-      <text x={500} y={150} fill="var(--brass-text)" fontSize="12.5" fontFamily="var(--font-mono)">
-        xlm · stellar testnet
+      <text x={500} y={150} fill="var(--brass-text)" fontSize="12.5" fontFamily="var(--font-sans)">
+        XLM, Stellar testnet
       </text>
 
       {/* horizon of states */}
@@ -182,14 +182,14 @@ export function StarCompass() {
           fill={s.text}
           fontSize="10.5"
           textAnchor="middle"
-          fontFamily="var(--font-mono)"
+          fontFamily="var(--font-sans)"
         >
           {s.label}
         </text>
       ))}
 
-      <text x={90} y={578} fill="var(--ink-3)" fontSize="10.5" fontFamily="var(--font-mono)">
-        one-way states · no cancel · poll every 3-5s
+      <text x={90} y={578} fill="var(--ink-3)" fontSize="10.5" fontFamily="var(--font-sans)">
+        One-way states, no cancel, poll every 3 to 5 seconds
       </text>
     </svg>
   );

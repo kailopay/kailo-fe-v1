@@ -99,7 +99,6 @@
   --color-plate-line: var(--plate-line);
   --color-paper-on-plate: var(--paper-on-plate);
   --font-sans: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
-  --font-mono: var(--font-sans);
 }
 
 /* One light world: near-white ground, navy ink, pastel state colors. */

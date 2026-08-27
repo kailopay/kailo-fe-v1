@@ -51,7 +51,7 @@ export function VerifyEmailClient({ token }: VerifyEmailClientProps) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="font-mono text-xs text-ink-3">auth · email verification</p>
+        <p className="text-xs text-ink-3">Email verification</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight">Verify your email</h1>
       </div>
 

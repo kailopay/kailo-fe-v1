@@ -90,7 +90,7 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
             This is the only time the full key is shown. The server keeps
             only a hash and cannot recover it.
           </p>
-          <p className="mt-3 break-all rounded-xl bg-white px-4 py-3 font-mono text-sm text-ink">
+          <p className="mt-3 break-all rounded-xl bg-white px-4 py-3 text-sm text-ink">
             {created.key}
           </p>
           <div className="mt-4 flex gap-2">
@@ -160,7 +160,7 @@ export function ApiKeysPanel({ initialKeys }: ApiKeysPanelProps) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 truncate font-mono text-xs text-ink-3">
+                  <p className="mt-1 truncate text-xs text-ink-3">
                     {apiKey.prefix}
                   </p>
                   <p className="mt-1 text-xs text-ink-3">
