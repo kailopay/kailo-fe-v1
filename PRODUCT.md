@@ -82,14 +82,14 @@ wiped on logout; 401 means redirect to sign-in; two error envelope styles
   system stack so local builds remain offline-safe.
 - UI copy language: English (Indonesian payment terms stay as-is: QRIS,
   virtual account, rupiah).
-- Pinned by the user: Plus Jakarta Sans stays the only typeface, but the visual
-  world is now warm editorial rather than a pastel card stack. Cream paper,
-  deep navy ink, coral Buy, aqua Sell, lilac Testnet, and mango rate cues keep
+- Pinned by the user: Plus Jakarta Sans stays the only typeface. The visual
+  world is a cool digital wallet rather than a pastel card stack: cool white,
+  deep navy ink, cobalt Buy, mint Sell, violet Testnet, and amber rate cues keep
   the product joyful without turning every surface into a colored tile.
-- The consumer signature is the exchange itself: a quiet route line, one amount
-  field, a visible destination, live-rate state copy, and a calm handoff. The
-  developer signature is a denser workbench with a rail, API keys, playground,
-  order state, and technical recovery paths.
+- The consumer signature is the exchange itself: one focused exchange card, a
+  clear IDR/XLM direction, a visible destination, live-rate state copy, and a
+  calm handoff. The developer signature is a denser workbench with a rail, API
+  keys, playground, order state, and technical recovery paths.
 - UI copy uses Plus Jakarta Sans and readable spacing. Technical identifiers
   use contrast and wrapping instead of a monospace font or centered-dot context
   lines.

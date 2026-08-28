@@ -7,7 +7,6 @@ import { formatIdrInput, parseIdrInput } from "@/lib/format-money";
 import { AmountField } from "./amount-field";
 import { exchangeCopy } from "./consumer-copy";
 import { LiveRateStrip } from "./live-rate-strip";
-import { RouteVisual } from "./route-visual";
 import type { ConsumerDirection } from "./rate";
 
 const STELLAR_ACCOUNT_PATTERN = /^G[A-Z2-7]{55}$/;
@@ -70,20 +69,19 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 lg:py-14">
-      <header className="mb-10 flex flex-wrap items-end justify-between gap-5">
-        <div className="max-w-xl">
-          <p className="text-sm font-bold text-coral-deep">Your exchange</p>
-          <h1 className="kp-page-heading mt-3">{copy.title}</h1>
-          <p className="kp-copy mt-4">{copy.description} No real money moves in this sandbox.</p>
-        </div>
-        <p className="text-sm font-semibold text-ink-3">Welcome back, {displayName}</p>
-      </header>
+    <div className="kp-consumer-page">
+      <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 lg:py-12">
+        <header className="kp-consumer-header">
+          <div className="kp-consumer-header-copy">
+            <h1 className="kp-page-heading kp-consumer-heading">{copy.title}</h1>
+            <p className="kp-copy mt-3 text-sm">{copy.description} No real money moves in this sandbox.</p>
+          </div>
+          <p className="kp-consumer-greeting">Welcome back, {displayName}</p>
+        </header>
 
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-20">
-        <section aria-labelledby="consumer-exchange-title" className="kp-exchange-frame">
-          <div className="kp-exchange-top">
-            <div>
+        <div className="kp-consumer-layout">
+          <section aria-labelledby="consumer-exchange-title" className="kp-consumer-card">
+            <div className="kp-consumer-card-top">
               <h2 className="sr-only" id="consumer-exchange-title">Exchange details</h2>
               <div aria-label="Transaction direction" className="kp-direction-tabs" role="group">
                 <button
@@ -107,14 +105,25 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
                   Sell XLM
                 </button>
               </div>
+              <span className="kp-network-note">Stellar Testnet</span>
             </div>
-            <span className="kp-network-note">Stellar Testnet</span>
-          </div>
 
-          <div className="kp-exchange-body">
-            <RouteVisual direction={direction} />
+            <div className="kp-consumer-card-body">
+              <div className="kp-consumer-route-summary" aria-label={`${copy.sourceCurrency} to ${copy.destinationCurrency} exchange`}>
+                <div className="kp-consumer-route-cell">
+                  <span className="kp-consumer-route-label">From</span>
+                  <strong className="kp-consumer-route-currency">{copy.sourceCurrency}</strong>
+                  <span className="kp-consumer-route-detail">{isBuy ? "Rupiah" : "Stellar Testnet"}</span>
+                </div>
+                <span aria-hidden="true" className="kp-consumer-route-arrow">to</span>
+                <div className="kp-consumer-route-cell">
+                  <span className="kp-consumer-route-label">To</span>
+                  <strong className="kp-consumer-route-currency">{copy.destinationCurrency}</strong>
+                  <span className="kp-consumer-route-detail">{isBuy ? "Stellar Testnet" : "Sandbox payout"}</span>
+                </div>
+              </div>
 
-            <form className="mt-7" onSubmit={handleSubmit}>
+              <form className="mt-5" onSubmit={handleSubmit}>
               {isBuy ? (
                 <AmountField
                   currency="IDR"
@@ -274,6 +283,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
           </div>
         </aside>
       </div>
+    </div>
     </div>
   );
 }

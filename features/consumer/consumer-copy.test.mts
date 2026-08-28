@@ -5,7 +5,7 @@ import { exchangeCopy } from "./consumer-copy.ts";
 test("buy copy makes the IDR to XLM action explicit", () => {
   assert.deepEqual(exchangeCopy("buy"), {
     title: "Buy XLM",
-    description: "Buy testnet XLM with rupiah.",
+    description: "Use rupiah to buy Stellar testnet XLM.",
     sourceLabel: "You pay",
     destinationLabel: "You receive",
     sourceCurrency: "IDR",
@@ -19,7 +19,7 @@ test("buy copy makes the IDR to XLM action explicit", () => {
 test("sell copy makes the XLM to IDR action explicit", () => {
   assert.deepEqual(exchangeCopy("sell"), {
     title: "Sell XLM",
-    description: "Sell XLM for a simulated rupiah payout.",
+    description: "Send testnet XLM for a simulated rupiah payout.",
     sourceLabel: "You send",
     destinationLabel: "You receive",
     sourceCurrency: "XLM",

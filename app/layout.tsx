@@ -19,9 +19,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {/*
           Visual contract: the exchange is the product, not a dashboard. The
-          consumer surface uses warm paper, ink, coral, and teal with quiet
-          route-first hierarchy. Developer routes keep a denser workbench for
-          sandbox tools, API keys, and order recovery.
+          consumer surface uses cool white, navy ink, cobalt action, mint sell,
+          and violet testnet cues around one focused exchange card. Developer
+          routes keep a denser workbench for sandbox tools, API keys, and order
+          recovery.
         */}
         {children}
       </body>

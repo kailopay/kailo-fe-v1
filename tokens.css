@@ -1,34 +1,47 @@
-/* Hallmark · macrostructure: Workbench · tone: warm editorial · anchor hue: coral */
+/* Hallmark · macrostructure: Workbench · tone: cool digital wallet · anchor hue: cobalt */
 /* Hallmark · pre-emit critique: P5 H5 E4 S5 R5 V4 */
 
 :root {
-  --paper: oklch(97.5% 0.012 86);
-  --milk: oklch(98.7% 0.008 86);
-  --paper-recess: oklch(94.8% 0.018 88);
-  --cloud: oklch(96.8% 0.012 230);
-  --ink: oklch(24% 0.035 255);
-  --ink-deep: oklch(18% 0.04 255);
-  --ink-2: oklch(44% 0.035 255);
-  --ink-3: oklch(61% 0.028 255);
-  --line: oklch(88% 0.018 255);
-  --line-strong: oklch(71% 0.038 255);
+  --paper: oklch(98.6% 0.006 245);
+  --milk: oklch(99.3% 0.003 245);
+  --paper-recess: oklch(95.7% 0.018 245);
+  --cloud: oklch(96.3% 0.022 240);
+  --ink: oklch(23% 0.045 255);
+  --ink-deep: oklch(15% 0.055 255);
+  --ink-2: oklch(42% 0.045 255);
+  --ink-3: oklch(58% 0.032 250);
+  --line: oklch(88.5% 0.026 245);
+  --line-strong: oklch(71% 0.05 245);
 
-  --coral: oklch(67% 0.18 36);
-  --coral-deep: oklch(43% 0.14 34);
-  --coral-tint: oklch(93.5% 0.04 36);
-  --aqua: oklch(71% 0.13 172);
-  --aqua-deep: oklch(42% 0.1 172);
-  --aqua-tint: oklch(94% 0.035 172);
-  --lilac: oklch(78% 0.1 300);
-  --lilac-deep: oklch(46% 0.1 300);
-  --lilac-tint: oklch(94.5% 0.025 300);
-  --mango: oklch(82% 0.12 82);
-  --mango-deep: oklch(45% 0.1 75);
-  --mango-tint: oklch(96% 0.035 82);
+  --cobalt: oklch(58% 0.205 263);
+  --cobalt-deep: oklch(40% 0.17 263);
+  --cobalt-tint: oklch(94% 0.04 263);
+  --mint: oklch(73% 0.145 164);
+  --mint-deep: oklch(39% 0.105 164);
+  --mint-tint: oklch(94% 0.04 164);
+  --violet: oklch(75% 0.13 292);
+  --violet-deep: oklch(43% 0.115 292);
+  --violet-tint: oklch(94% 0.03 292);
+  --amber: oklch(79% 0.14 83);
+  --amber-deep: oklch(43% 0.115 78);
+  --amber-tint: oklch(95% 0.035 83);
 
   /* Compatibility aliases for the existing order workspace. */
-  --sky: oklch(70% 0.11 235);
-  --sky-deep: oklch(43% 0.1 235);
+  --coral: var(--cobalt);
+  --coral-deep: var(--cobalt-deep);
+  --coral-tint: var(--cobalt-tint);
+  --aqua: var(--mint);
+  --aqua-deep: var(--mint-deep);
+  --aqua-tint: var(--mint-tint);
+  --lilac: var(--violet);
+  --lilac-deep: var(--violet-deep);
+  --lilac-tint: var(--violet-tint);
+  --mango: var(--amber);
+  --mango-deep: var(--amber-deep);
+  --mango-tint: var(--amber-tint);
+
+  --sky: oklch(70% 0.12 235);
+  --sky-deep: oklch(43% 0.11 235);
   --sky-tint: oklch(94% 0.03 235);
   --sea: var(--aqua);
   --sea-deep: var(--aqua-deep);
@@ -39,20 +52,20 @@
   --sun: var(--mango);
   --sun-deep: var(--mango-deep);
   --sun-tint: var(--mango-tint);
-  --brass: oklch(61% 0.12 75);
-  --brass-text: oklch(45% 0.1 75);
-  --brass-deep: oklch(37% 0.09 75);
+  --brass: var(--amber);
+  --brass-text: var(--amber-deep);
+  --brass-deep: oklch(37% 0.09 78);
   --gold: oklch(76% 0.13 80);
 
-  --surface: oklch(99.4% 0.004 90);
-  --surface-2: oklch(96% 0.012 255);
-  --accent-tint: var(--coral-tint);
-  --accent-text: var(--coral-deep);
+  --surface: oklch(99.7% 0.003 245);
+  --surface-2: oklch(96.1% 0.02 240);
+  --accent-tint: var(--cobalt-tint);
+  --accent-text: var(--cobalt-deep);
   --st-red-bg: oklch(94% 0.035 30);
   --st-red: oklch(45% 0.14 30);
   --ink-plate: var(--ink-deep);
   --plate-line: oklch(34% 0.05 255);
-  --paper-on-plate: oklch(96% 0.015 255);
+  --paper-on-plate: oklch(98.5% 0.006 245);
 
   --kp-font-sans: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --kp-font-display: var(--kp-font-sans);
@@ -75,14 +88,14 @@
   --text-lg: 1.125rem;
   --text-xl: 1.375rem;
   --text-2xl: 1.75rem;
-  --text-display: clamp(2.9rem, 7vw, 5.75rem);
+  --text-display: clamp(2.7rem, 6vw, 4.8rem);
 
   --radius-sm: 0.625rem;
   --radius-md: 0.875rem;
   --radius-lg: 1.25rem;
   --radius-pill: 999px;
   --rule-thin: 1px solid var(--line);
-  --focus-ring: var(--coral-deep);
+  --focus-ring: var(--cobalt-deep);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);

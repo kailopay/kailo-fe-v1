@@ -14,7 +14,7 @@ export type ExchangeCopy = {
 
 const BUY_COPY: ExchangeCopy = {
   title: "Buy XLM",
-  description: "Buy testnet XLM with rupiah.",
+  description: "Use rupiah to buy Stellar testnet XLM.",
   sourceLabel: "You pay",
   destinationLabel: "You receive",
   sourceCurrency: "IDR",
@@ -26,7 +26,7 @@ const BUY_COPY: ExchangeCopy = {
 
 const SELL_COPY: ExchangeCopy = {
   title: "Sell XLM",
-  description: "Sell XLM for a simulated rupiah payout.",
+  description: "Send testnet XLM for a simulated rupiah payout.",
   sourceLabel: "You send",
   destinationLabel: "You receive",
   sourceCurrency: "XLM",
