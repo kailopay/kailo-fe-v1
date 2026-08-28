@@ -40,7 +40,7 @@ function ConsumerChrome({ pathname, user, children }: SessionChromeProps & { pat
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-paper">
-      <header className="border-b border-line bg-paper">
+      <header className="bg-paper/80">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-7 px-5 py-5 sm:px-8">
           <Link className="kp-brand shrink-0" href="/">KailoPay</Link>
           <nav aria-label="Consumer navigation" className="hidden items-center gap-5 sm:flex">
@@ -67,7 +67,7 @@ function ConsumerChrome({ pathname, user, children }: SessionChromeProps & { pat
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-2.5 md:hidden">
+        <div className="flex items-center justify-between gap-3 bg-surface/70 px-5 py-2.5 md:hidden">
           <SandboxBadges />
           <span className="text-xs font-semibold text-ink-3">Testnet only</span>
         </div>
@@ -102,7 +102,7 @@ function DeveloperChrome({ pathname, user, children }: SessionChromeProps & { pa
     <div className="kp-developer-shell flex min-h-full flex-1">
       <aside className="kp-dev-rail hidden w-60 shrink-0 flex-col gap-8 p-6 md:flex">
         <Link className="kp-brand" href="/developer">KailoPay</Link>
-        <div className="border-t border-line pt-5">
+        <div className="pt-5">
           <p className="text-xs font-bold text-ink-3">Developer workspace</p>
           <p className="mt-2 text-sm leading-6 text-ink-2">Build against the sandbox order API.</p>
         </div>
@@ -123,7 +123,7 @@ function DeveloperChrome({ pathname, user, children }: SessionChromeProps & { pa
           ))}
           <Link className="kp-dev-nav-link mt-2" data-active="false" href="/buy">Back to consumer</Link>
         </nav>
-        <div className="mt-auto border-t border-line pt-5">
+        <div className="mt-auto pt-5">
           <p className="truncate text-sm font-bold text-ink">{user.display_name}</p>
           <p className="mt-1 truncate text-xs text-ink-3">{user.email}</p>
           <div className="mt-4">

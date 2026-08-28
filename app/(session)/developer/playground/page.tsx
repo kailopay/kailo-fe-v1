@@ -22,9 +22,8 @@ export default async function PlaygroundPage(
         </div>
         <SandboxBadges />
       </header>
-      <div className="mt-5 flex flex-wrap gap-4 border-y border-line py-4 text-xs font-bold text-ink-3">
+      <div className="kp-dev-context mt-5 text-xs font-bold text-ink-3">
         <span>Same sandbox API as the consumer route</span>
-        <span aria-hidden className="h-4 w-px bg-line-strong" />
         <span>No real money moves</span>
       </div>
       <div className="mt-8">

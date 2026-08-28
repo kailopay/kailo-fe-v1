@@ -95,6 +95,7 @@
   --radius-lg: 1.25rem;
   --radius-pill: 999px;
   --rule-thin: 1px solid var(--line);
+  --shadow-soft: 0 20px 52px -28px color-mix(in oklch, var(--ink-deep) 24%, transparent);
   --focus-ring: var(--cobalt-deep);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);

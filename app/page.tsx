@@ -59,7 +59,7 @@ export default async function Home(): Promise<React.ReactElement> {
         </div>
       </section>
 
-      <footer className="mt-auto border-t border-line">
+      <footer className="mt-auto bg-paper/55">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-6 text-sm sm:px-8">
           <p className="font-bold text-ink">KailoPay</p>
           <p className="text-xs text-ink-3">Sandbox build, Stellar Testnet only</p>

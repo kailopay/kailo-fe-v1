@@ -55,9 +55,8 @@ export default async function DeveloperPage(): Promise<React.ReactElement> {
         <Link className="kp-action-link" href="/developer/playground">Open Playground</Link>
       </header>
 
-      <div className="mt-10 flex flex-wrap items-center gap-4 border-y border-line py-4 text-xs font-bold text-ink-3">
+      <div className="kp-dev-context mt-10 text-xs font-bold text-ink-3">
         <span>Key scope: sandbox order API</span>
-        <span aria-hidden className="h-4 w-px bg-line-strong" />
         <span>Prefix: pk_test_</span>
       </div>
 

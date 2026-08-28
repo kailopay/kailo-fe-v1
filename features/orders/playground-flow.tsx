@@ -267,7 +267,7 @@ export function PlaygroundFlow({ initialOrderId }: { initialOrderId?: string }) 
         </div>
       </section>
 
-      <div className="mt-12 border-t border-line pt-8 lg:col-span-2">
+      <div className="kp-dev-history mt-12 lg:col-span-2">
         <OrderHistory
           apiKey={apiKey}
           onOpenOrder={setOrder}

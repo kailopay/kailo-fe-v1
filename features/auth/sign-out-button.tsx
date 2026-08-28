@@ -21,7 +21,7 @@ export function SignOutButton() {
 
   return (
     <button
-      className="rounded-lg border border-line-strong px-3 py-1.5 text-sm font-medium text-ink-2 transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+      className="kp-signout-button disabled:opacity-50"
       disabled={busy}
       onClick={() => void handleSignOut()}
       type="button"

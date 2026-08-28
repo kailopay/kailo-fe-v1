@@ -109,7 +109,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
             </div>
 
             <div className="kp-consumer-card-body">
-              <div className="kp-consumer-route-summary" aria-label={`${copy.sourceCurrency} to ${copy.destinationCurrency} exchange`}>
+              <div className="kp-consumer-route-summary" aria-label={`${copy.sourceCurrency} to ${copy.destinationCurrency} exchange`} data-tone={isBuy ? "buy" : "sell"}>
                 <div className="kp-consumer-route-cell">
                   <span className="kp-consumer-route-label">From</span>
                   <strong className="kp-consumer-route-currency">{copy.sourceCurrency}</strong>
@@ -124,88 +124,93 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
               </div>
 
               <form className="mt-5" onSubmit={handleSubmit}>
-              {isBuy ? (
-                <AmountField
-                  currency="IDR"
-                  id="consumer-idr-amount"
-                  label={copy.sourceLabel}
-                  onChange={handleIdrChange}
-                  placeholder="500.000"
-                  tone="coral"
-                  value={idrAmount}
-                />
-              ) : (
-                <AmountField
-                  currency="XLM"
-                  id="consumer-xlm-amount"
-                  label={copy.sourceLabel}
-                  onChange={(value) => {
-                    setXlmAmount(value);
-                    setError(null);
-                  }}
-                  placeholder="25.0000000"
-                  tone="aqua"
-                  value={xlmAmount}
-                />
-              )}
+                <div className="kp-consumer-quote-grid">
+                  <div>
+                    {isBuy ? (
+                      <AmountField
+                        currency="IDR"
+                        id="consumer-idr-amount"
+                        label={copy.sourceLabel}
+                        onChange={handleIdrChange}
+                        placeholder="500.000"
+                        tone="coral"
+                        value={idrAmount}
+                      />
+                    ) : (
+                      <AmountField
+                        currency="XLM"
+                        id="consumer-xlm-amount"
+                        label={copy.sourceLabel}
+                        onChange={(value) => {
+                          setXlmAmount(value);
+                          setError(null);
+                        }}
+                        placeholder="25.0000000"
+                        tone="aqua"
+                        value={xlmAmount}
+                      />
+                    )}
+                  </div>
 
-              <div className="kp-receive-row">
-                <span className="kp-receive-label">{copy.destinationLabel}</span>
-                <span className="kp-receive-value">
-                  {isBuy ? "Quote at checkout" : "Payout after deposit"}{" "}
-                  <span className="kp-currency">{copy.destinationCurrency}</span>
-                </span>
-              </div>
+                  <div className="kp-receive-row">
+                    <span className="kp-receive-label">{copy.destinationLabel}</span>
+                    <span className="kp-receive-value">
+                      {isBuy ? "Quote at checkout" : "Payout after deposit"}{" "}
+                      <span className="kp-currency">{copy.destinationCurrency}</span>
+                    </span>
+                  </div>
+                  <LiveRateStrip direction={direction} quote={null} />
+                </div>
 
-              <div className="mt-5">
-                <LiveRateStrip direction={direction} quote={null} />
-              </div>
-
-              <div className="kp-detail-section">
+                <div className="kp-detail-section">
                 <h3 className="kp-detail-heading">{copy.destinationTitle}</h3>
                 <p className="kp-detail-copy">{copy.destinationDescription}</p>
 
                 {isBuy ? (
                   <>
-                    <label className="mt-5 block" htmlFor="consumer-stellar-destination">
-                      <span className="kp-field-label">Stellar destination</span>
-                      <input
-                        className="kp-input mt-2"
-                        data-tone="buy"
-                        id="consumer-stellar-destination"
-                        onChange={(event) => {
-                          setStellarDestination(event.target.value);
-                          setError(null);
-                        }}
-                        placeholder="G... testnet address"
-                        value={stellarDestination}
-                      />
-                    </label>
-                    <p className="mt-2 text-xs leading-5 text-ink-3">Mainnet addresses are rejected in this release.</p>
-
-                    <fieldset className="mt-5">
-                      <legend className="kp-field-label">Choose how you pay</legend>
-                      <div className="kp-choice-row mt-2">
-                        <button
-                          aria-pressed={paymentMethod === "qris"}
-                          className="kp-choice"
-                          data-active={paymentMethod === "qris"}
-                          onClick={() => setPaymentMethod("qris")}
-                          type="button"
-                        >
-                          QRIS
-                        </button>
-                        <button
-                          aria-pressed={paymentMethod === "bri_va"}
-                          className="kp-choice"
-                          data-active={paymentMethod === "bri_va"}
-                          onClick={() => setPaymentMethod("bri_va")}
-                          type="button"
-                        >
-                          BRI virtual account
-                        </button>
+                    <div className="kp-consumer-destination-grid mt-5">
+                      <div>
+                        <label className="block" htmlFor="consumer-stellar-destination">
+                          <span className="kp-field-label">Stellar destination</span>
+                          <input
+                            className="kp-input mt-2"
+                            data-tone="buy"
+                            id="consumer-stellar-destination"
+                            onChange={(event) => {
+                              setStellarDestination(event.target.value);
+                              setError(null);
+                            }}
+                            placeholder="G... testnet address"
+                            value={stellarDestination}
+                          />
+                        </label>
+                        <p className="mt-2 text-xs leading-5 text-ink-3">Mainnet addresses are rejected in this release.</p>
                       </div>
-                    </fieldset>
+
+                      <fieldset>
+                        <legend className="kp-field-label">Choose how you pay</legend>
+                        <div className="kp-choice-row mt-2">
+                          <button
+                            aria-pressed={paymentMethod === "qris"}
+                            className="kp-choice"
+                            data-active={paymentMethod === "qris"}
+                            onClick={() => setPaymentMethod("qris")}
+                            type="button"
+                          >
+                            QRIS
+                          </button>
+                          <button
+                            aria-pressed={paymentMethod === "bri_va"}
+                            className="kp-choice"
+                            data-active={paymentMethod === "bri_va"}
+                            onClick={() => setPaymentMethod("bri_va")}
+                            type="button"
+                          >
+                            BRI virtual account
+                          </button>
+                        </div>
+                      </fieldset>
+                    </div>
 
                     <details className="kp-detail-section">
                       <summary className="cursor-pointer text-sm font-bold text-ink">
@@ -243,16 +248,16 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
                       />
                     </label>
                     <p className="mt-2 text-xs leading-5 text-ink-3">Week 2 uses this reference to simulate the bank destination.</p>
-                  </>
+                    </>
                 )}
-              </div>
+                </div>
 
-              {error !== null && <p className="kp-notice mt-5" data-tone="warning" role="alert">{error}</p>}
+                {error !== null && <p className="kp-notice mt-5" data-tone="warning" role="alert">{error}</p>}
 
-              <button className="kp-primary-button mt-6 w-full" type="submit">
-                {reviewing ? "Review again" : copy.submitLabel}
-              </button>
-            </form>
+                <button className="kp-primary-button mt-6 w-full" type="submit">
+                  {reviewing ? "Review again" : copy.submitLabel}
+                </button>
+              </form>
 
             {reviewing && (
               <div className="kp-reveal" role="status">
@@ -264,12 +269,12 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
           </div>
         </section>
 
-        <aside className="self-start">
+        <aside className="kp-consumer-side self-start">
           <div className="kp-notice" data-tone="warning">
             <p className="font-bold text-ink">Testnet only</p>
             <p className="mt-1">This is a sandbox route. It does not move real IDR or XLM.</p>
           </div>
-          <div className="mt-8 border-t border-line pt-5">
+          <div className="kp-consumer-side-block">
             <h2 className="text-sm font-bold text-ink">What you will see</h2>
             <ul className="mt-3 flex flex-col gap-3 text-sm leading-6 text-ink-2">
               <li>the amount you start with</li>
@@ -277,7 +282,7 @@ export function ConsumerFlow({ initialDirection, displayName }: ConsumerFlowProp
               <li>the exact rate after the order is created</li>
             </ul>
           </div>
-          <div className="mt-8 border-t border-line pt-5">
+          <div className="kp-consumer-side-block">
             <p className="text-sm leading-6 text-ink-2">Need API keys, request ids, or order polling?</p>
             <Link className="kp-action-link mt-3 inline-flex" href="/developer">Open Developer Mode</Link>
           </div>
