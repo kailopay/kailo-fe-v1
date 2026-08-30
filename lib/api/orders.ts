@@ -50,15 +50,32 @@ function parseCheckout(value: unknown): Checkout | null {
   if (value === null || value === undefined) return null;
   if (!isRecord(value)) throw malformed("checkout");
   const presentation = stringField(value, "presentation_type");
-  if (presentation !== "QR_STRING" && presentation !== "VIRTUAL_ACCOUNT_NUMBER") {
+  if (
+    presentation !== "PAYMENT_LINK" &&
+    presentation !== "QR_STRING" &&
+    presentation !== "VIRTUAL_ACCOUNT_NUMBER"
+  ) {
     throw malformed("checkout presentation_type");
+  }
+  const presentationValue = optionalStringField(value, "presentation_value");
+  const paymentLinkUrl = optionalStringField(value, "payment_link_url");
+  if (presentation === "PAYMENT_LINK" && paymentLinkUrl === undefined && presentationValue === undefined) {
+    throw malformed("checkout payment link");
+  }
+  if (presentation !== "PAYMENT_LINK" && presentationValue === undefined) {
+    throw malformed("checkout presentation_value");
+  }
+  const expiresAt = value.expires_at;
+  if (expiresAt !== null && expiresAt !== undefined && typeof expiresAt !== "string") {
+    throw malformed("checkout expires_at");
   }
   return {
     id: stringField(value, "id"),
     status: stringField(value, "status"),
     presentation_type: presentation,
-    presentation_value: stringField(value, "presentation_value"),
-    expires_at: stringField(value, "expires_at"),
+    presentation_value: presentationValue,
+    payment_link_url: paymentLinkUrl,
+    expires_at: expiresAt ?? null,
   };
 }
 
@@ -102,7 +119,12 @@ function parseOrderBody(order: Record<string, unknown>): Order {
   if (memo !== null && typeof memo !== "string") throw malformed("destination memo");
 
   const rawPaymentMethod = order.payment_method;
-  if (rawPaymentMethod !== null && rawPaymentMethod !== "qris" && rawPaymentMethod !== "bri_va") {
+  if (
+    rawPaymentMethod !== null &&
+    rawPaymentMethod !== "xendit" &&
+    rawPaymentMethod !== "qris" &&
+    rawPaymentMethod !== "bri_va"
+  ) {
     throw malformed("payment_method");
   }
 
@@ -161,7 +183,7 @@ function optionalStringField(record: Record<string, unknown>, key: string): stri
 }
 
 export type CreateOrderInput = {
-  apiKey: string;
+  apiKey?: string;
   idempotencyKey: string;
   amountMinor: string;
   paymentMethod: PaymentMethod;
@@ -194,13 +216,14 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
   // 202 is an ok-status response whose body is the error envelope: the
   // checkout outcome is being reconciled. Surface it as a typed hold, not
   // a malformed payload.
-  const holdCode = readOnrampErrorCode(payload);
-  if (holdCode !== null) {
+  const hold = readOnrampError(payload);
+  if (hold !== null) {
     throw new ApiError(
       "The checkout outcome is being confirmed with the payment provider.",
       202,
-      holdCode,
-      null,
+      hold.code,
+      hold.requestId,
+      hold.orderId,
     );
   }
   return parseOrderEnvelope(payload);
@@ -225,14 +248,29 @@ export async function createOfframp(input: CreateOfframpInput): Promise<Order> {
 }
 
 /** Error code when an ok-status payload is actually an OnrampError body. */
-function readOnrampErrorCode(payload: unknown): string | null {
+function readOnrampError(payload: unknown): {
+  code: string;
+  requestId: string | null;
+  orderId: string | null;
+} | null {
   if (!isRecord(payload) || !isRecord(payload.error)) return null;
   const code: unknown = payload.error.code;
-  return typeof code === "string" ? code : null;
+  if (typeof code !== "string") return null;
+  const requestId: unknown = payload.request_id;
+  const orderId: unknown = payload.order_id;
+  return {
+    code,
+    requestId: typeof requestId === "string" ? requestId : null,
+    orderId: typeof orderId === "string" ? orderId : null,
+  };
 }
 
-export async function getOrder(id: string, apiKey: string): Promise<Order> {
-  const payload: unknown = await apiRequest(`/v1/orders/${id}`, { apiKey });
+export async function getOrder(
+  id: string,
+  apiKey?: string,
+  options: { signal?: AbortSignal } = {},
+): Promise<Order> {
+  const payload: unknown = await apiRequest(`/v1/orders/${id}`, { apiKey, signal: options.signal });
   return parseOrderEnvelope(payload);
 }
 
@@ -244,15 +282,18 @@ export type OrdersPage = {
 
 /** GET /v1/orders with cursor pagination. */
 export async function listOrders(
-  apiKey: string,
-  options: { cursor?: string; limit?: number } = {},
+  apiKey?: string,
+  options: { cursor?: string; limit?: number; signal?: AbortSignal } = {},
 ): Promise<OrdersPage> {
   const limit = Math.min(Math.max(options.limit ?? 20, 1), 100);
   const params = new URLSearchParams({ limit: String(limit) });
   if (options.cursor !== undefined && options.cursor !== "") {
     params.set("cursor", options.cursor);
   }
-  const payload: unknown = await apiRequest(`/v1/orders?${params.toString()}`, { apiKey });
+  const payload: unknown = await apiRequest(`/v1/orders?${params.toString()}`, {
+    apiKey,
+    signal: options.signal,
+  });
   if (!isRecord(payload) || !Array.isArray(payload.orders)) throw malformed("orders page");
   const nextCursor: unknown = payload.next_cursor;
   if (typeof nextCursor !== "string") throw malformed("next_cursor");

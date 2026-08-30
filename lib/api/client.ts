@@ -15,6 +15,7 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code: string | null,
     readonly requestId: string | null,
+    readonly orderId: string | null = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -45,13 +46,22 @@ export function buildHeaders(options: RequestOptions): Record<string, string> {
 }
 
 export async function toApiError(response: Response): Promise<ApiError> {
-  const requestId = response.headers.get("X-Request-ID");
+  let requestId = response.headers.get("X-Request-ID");
+  let orderId: string | null = null;
   let message = response.statusText || "Request failed";
   let code: string | null = null;
 
   try {
     const payload: unknown = await response.json();
-    if (isRecord(payload) && "error" in payload) {
+    if (isRecord(payload)) {
+      const bodyRequestId: unknown = payload.request_id;
+      if (requestId === null && typeof bodyRequestId === "string") requestId = bodyRequestId;
+      const bodyOrderId: unknown = payload.order_id;
+      if (typeof bodyOrderId === "string") orderId = bodyOrderId;
+
+      if (!("error" in payload)) {
+        return new ApiError(message, response.status, code, requestId, orderId);
+      }
       const error: unknown = payload.error;
       if (typeof error === "string") {
         message = error;
@@ -64,7 +74,7 @@ export async function toApiError(response: Response): Promise<ApiError> {
     // Non-JSON error body; keep the status text.
   }
 
-  return new ApiError(message, response.status, code, requestId);
+  return new ApiError(message, response.status, code, requestId, orderId);
 }
 
 /**
@@ -79,7 +89,7 @@ export async function apiRequest(
     method: options.method ?? (options.body !== undefined ? "POST" : "GET"),
     headers: buildHeaders(options),
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
-    credentials: "same-origin",
+    credentials: "include",
     cache: "no-store",
     signal: options.signal,
   });
@@ -249,7 +259,7 @@ export async function apiUpload(path: string, field: string, file: File): Promis
   const response = await fetch(path, {
     method: "PUT",
     body,
-    credentials: "same-origin",
+    credentials: "include",
     cache: "no-store",
   });
   if (!response.ok) throw await toApiError(response);

@@ -92,3 +92,15 @@ export const ACTIVE_STATUSES: readonly OrderStatus[] = [
 export function isActiveStatus(status: OrderStatus): boolean {
   return ACTIVE_STATUSES.includes(status);
 }
+
+export const TERMINAL_STATUSES: readonly OrderStatus[] = [
+  "completed",
+  "expired",
+  "payment_failed",
+  "stellar_failed",
+  "cancelled",
+];
+
+export function isTerminalStatus(status: OrderStatus): boolean {
+  return TERMINAL_STATUSES.includes(status);
+}

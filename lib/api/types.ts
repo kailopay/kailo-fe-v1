@@ -17,7 +17,7 @@ export type User = {
   avatar_url?: string;
 };
 
-export type PaymentMethod = "qris" | "bri_va";
+export type PaymentMethod = "xendit" | "qris" | "bri_va";
 
 export type OrderStatus =
   | "created"
@@ -48,6 +48,7 @@ export type Quote = {
 };
 
 export type CheckoutPresentation =
+  | "PAYMENT_LINK"
   | "QR_STRING"
   | "VIRTUAL_ACCOUNT_NUMBER";
 
@@ -55,8 +56,9 @@ export type Checkout = {
   id: string;
   status: string;
   presentation_type: CheckoutPresentation;
-  presentation_value: string;
-  expires_at: string;
+  presentation_value?: string;
+  payment_link_url?: string;
+  expires_at: string | null;
 };
 
 export type Payout = {
