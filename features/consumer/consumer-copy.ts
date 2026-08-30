@@ -21,7 +21,7 @@ const BUY_COPY: ExchangeCopy = {
   destinationCurrency: "XLM",
   destinationTitle: "Where should your XLM go?",
   destinationDescription: "Use a Stellar testnet address you control.",
-  submitLabel: "Review buy",
+  submitLabel: "Continue to payment",
 };
 
 const SELL_COPY: ExchangeCopy = {

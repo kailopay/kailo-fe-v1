@@ -270,7 +270,7 @@ export async function getOrder(
   apiKey?: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<Order> {
-  const payload: unknown = await apiRequest(`/v1/orders/${id}`, { apiKey, signal: options.signal });
+  const payload: unknown = await apiRequest(`/v1/orders/${encodeURIComponent(id)}`, { apiKey, signal: options.signal });
   return parseOrderEnvelope(payload);
 }
 

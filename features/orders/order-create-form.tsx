@@ -20,7 +20,7 @@ type OrderCreateFormProps = {
 
 export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
   const [amountDisplay, setAmountDisplay] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("qris");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("xendit");
   const [destination, setDestination] = useState("");
   const [memo, setMemo] = useState("");
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -75,6 +75,7 @@ export function OrderCreateForm({ busy, onSubmit }: OrderCreateFormProps) {
         <div className="flex gap-2">
           {(
             [
+              { value: "xendit", label: "Xendit hosted" },
               { value: "qris", label: "QRIS" },
               { value: "bri_va", label: "BRI virtual account" },
             ] as const

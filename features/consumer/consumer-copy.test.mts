@@ -12,7 +12,7 @@ test("buy copy makes the IDR to XLM action explicit", () => {
     destinationCurrency: "XLM",
     destinationTitle: "Where should your XLM go?",
     destinationDescription: "Use a Stellar testnet address you control.",
-    submitLabel: "Review buy",
+    submitLabel: "Continue to payment",
   });
 });
 

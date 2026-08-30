@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ApiError } from "@/lib/api/client";
 import { formatIdr } from "@/lib/format-money";
 import type { Order } from "@/lib/api/types";
 import { getOrder } from "@/lib/api/orders";
@@ -20,34 +21,56 @@ function secondsRemaining(expiresAt: string): number {
 
 type OrderDetailProps = {
   order: Order;
-  apiKey: string;
+  apiKey?: string;
   onPollError: (message: string) => void;
+  onOrderChange?: (order: Order) => void;
+  onSessionExpired?: () => void;
 };
 
 /**
  * The order page as a three-step checkout story, in the Xendit payment-page
  * spirit: what you buy (1), pay (2), and what happens after (3).
  */
-export function OrderDetail({ order: initialOrder, apiKey, onPollError }: OrderDetailProps) {
+export function OrderDetail({
+  order: initialOrder,
+  apiKey,
+  onPollError,
+  onOrderChange,
+  onSessionExpired,
+}: OrderDetailProps): React.ReactElement {
   const [order, setOrder] = useState(initialOrder);
   const [remaining, setRemaining] = useState(() => secondsRemaining(initialOrder.quote.expires_at));
 
   // Poll while the order is in an active state; stop on anything terminal.
   useEffect(() => {
     if (!isActiveStatus(order.status)) return;
+    const controller = new AbortController();
     const timer = setInterval(async () => {
       try {
-        const fresh = await getOrder(initialOrder.id, apiKey);
+        const fresh = await getOrder(initialOrder.id, apiKey, { signal: controller.signal });
         setOrder(fresh);
         setRemaining(secondsRemaining(fresh.quote.expires_at));
+        onOrderChange?.(fresh);
         onPollError("");
-      } catch {
+      } catch (caught) {
+        if (controller.signal.aborted) return;
+        if (caught instanceof ApiError && caught.status === 401) onSessionExpired?.();
         // A missed poll is not an error state; the next tick retries.
         onPollError("Last poll failed. Retrying.");
       }
     }, POLL_INTERVAL_MS);
+    return () => {
+      controller.abort();
+      clearInterval(timer);
+    };
+  }, [initialOrder.id, order.status, apiKey, onOrderChange, onPollError, onSessionExpired]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRemaining(secondsRemaining(order.quote.expires_at));
+    }, 1000);
     return () => clearInterval(timer);
-  }, [initialOrder.id, order.status, apiKey, onPollError]);
+  }, [order.quote.expires_at]);
 
   const style = statusStyle(order.status);
   const route = routeStatus({ direction: order.direction, status: order.status });
