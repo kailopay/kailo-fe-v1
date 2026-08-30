@@ -69,6 +69,7 @@ export function ConsumerActivity(): React.ReactElement {
         <p className="kp-notice mt-6" data-tone="warning" role="alert">
           {error}
           {requestId !== null && <span className="ml-1">Keep request id <span className="break-all font-semibold">{requestId}</span> for support.</span>}
+          <button className="kp-quiet-button ml-4" onClick={() => void loadPage(undefined, true)} type="button">Try again</button>
         </p>
       )}
 
